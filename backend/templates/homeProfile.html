@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            overflow-x: hidden !important;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            width: 23%;
+            height: 80px;
+
+            background-color: rgb(221, 221, 221);
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            min-width: 50px;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: sans-serif;
+            font-size: 13px;
+            color: #444444;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.1s ease-in-out;
+        }
+
+        .nav__link:hover {
+            background-color: #eeeeee;
+        }
+
+        .nav__link--active {
+            color: #009578;
+        }
+
+        .nav__icon {
+            font-size: 18px;
+        }
+
+        .hh {
+            background-color: rgb(221, 221, 221);
+
+        }
+
+
+
+        .main {
+            height: 100vh;
+        }
+
+        .img-flud {
+            width: 200px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, 50%);
+            position: absolute;
+        }
+
+        .img-flui {
+            width: 100px;
+            height: 100px;
+            float: left;
+        }
+
+        .profile-form {
+            max-width: 400px;
+            margin: auto;
+
+            padding: 20px;
+            border-radius: 8px;
+
+        }
+
+        .profile-form label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .profile-form input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        .profile-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+
+        .profile-image-container {
+            position: relative;
+            text-align: center;
+            margin: 0 auto;
+            width: 250px;
+            height: 250px;
+        }
+
+        .profile-image {
+            width: 250px;
+            height: 250px;
+
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .replace-icon {
+            color: #fff;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .form-control:disabled {
+            background-color: #e9ecef00 !important;
+            opacity: 1;
+            border: aliceblue;
+        }
+
+        .home-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            min-width: 50px;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: sans-serif;
+            font-size: 13px;
+            color: #444444;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.1s ease-in-out;
+        }
+
+        .change-image-button {
+            display: none;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        @media (min-width: 767px) {
+            .home-logo {
+                display: none;
+            }
+
+            body {
+                overflow-x: hidden !important;
+            }
+
+        }
+
+        @media (max-width: 767px) {
+
+            /* Hide the home logo for screens smaller than 767px */
+            .home-logo {
+                display: flex;
+            }
+
+            /* Adjust width for the bottom navigation bar in mobile view */
+            .nav {
+                width: 100%;
+                margin: -12px !important;
+                height: 90px !important;
+            }
+
+            .img-fluid {
+                display: none;
+            }
+
+            .iuid {
+                margin-left: 42px !important;
+            }
+
+            body {
+                overflow-x: hidden !important;
+            }
+        }
+
+        @media (min-width: 375px) and (max-width: 767px) {
+            .col-sm-3 {
+                width: 100% !important;
+                flex: 0 0 auto;
+                height: auto !important;
+            }
+
+            body {
+                overflow-x: hidden !important;
+            }
+
+            .col-sm-9 {
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+            .center-content {
+                display: none !important;
+            }
+            .center-container {
+                height: 3vh !important;
+                text-align: center;
+                margin-top: 0px !important;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1300px) {
+            .col-sm-3 {
+                width: 100% !important;
+                flex: 0 0 auto;
+                height: auto !important;
+            }
+
+            .home-logo {
+                display: flex;
+            }
+
+            .col-sm-9 {
+                width: 100% !important;
+                flex: 0 0 auto;
+                margin-left: 0 !important;
+            }
+
+            .img-fluid {
+                display: none;
+            }
+
+            .center-content {
+                display: none !important;
+            }
+
+            .col-sm-9 .container {
+                margin-top: 20% !important;
+            }
+
+            .center-container {
+                height: 3vh !important;
+                text-align: center;
+                margin-top: 0px !important;
+            }
+
+            .nav {
+                width: 100%;
+                margin: -12px;
+            }
+
+            body {
+                overflow-x: hidden !important;
+            }
+        }
+
+
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div class="row main">
+        <div class="col-sm-3  hh">
+            <div class="bb-nav-wrapper p-5">
+                <div class="bb-nav__inner">
+                    <div class="d-flex align-items-center " style="justify-content: center;">
+                        <!-- Logo 1 -->
+                        <a href="#"><img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/HOME.png" alt="Logo 1" class="img-fluid mb-3 mx-2"
+                                style="height: 100px;min-width: 100px; float: left;"></a>
+
+                        <!-- Logo 2 -->
+                        <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/BLINKBOARDLOGO.png" alt="Logo 2" class="iuid "
+                            style="width: 200px; text-align: center; flex-shrink: 0;">
+                    </div>
+
+
+                    <div class="bb-username--wrapper mb-4">
+                        <h3 class="fz-18 fw-semibold text-center">@DanIsaRockstar</h3>
+                    </div>
+                    <div class="bb-profie--info__wrapper">
+                        <div class="profile-image-container" id="profileImageContainer">
+                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/DEFAULTPIC.png" alt="Profile Image" class="profile-image" id="profileImage" />
+                            <div class="overlay" id="imageOverlay">
+                                <div class="replace-icon" onclick="triggerFileInput()">
+                                    <img style="height: 250px; width: 250px;" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDPROFILEPIC.png"
+                                        alt="">
+                                </div>
+                            </div>
+                            <div class="change-image-button" onclick="changeImage()"></div>
+                        </div>
+
+                        <div class="bb-update__linkboard-btn text-center my-4 bb-home__header-left button__main fz-12"
+                            id="editButton">
+                            <button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT
+                                PROFILE</button>
+                        </div>
+
+                        <div class="profile-form" id="profileForm">
+
+                            <label for="location"
+                                class="bb-profile--info__title fz-14 text-center fw-reg fst-italic mb-2">Location:</label>
+                            <div class="form-group">
+                                <input type="text" class="form-control fz-18 fw-semibold text-center" id="location"
+                                    value="LOS ANGELES, CA" disabled>
+                            </div>
+
+                            <label for="quote"
+                                class="bb-profile--info__title fz-14 text-center fst-italic">Quote</label>
+                            <div class="form-group">
+                                <textarea class="form-control fz-16 fw-medium text-center" id="quote" rows="4"
+                                    disabled>Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are.</textarea>
+                            </div>
+
+                            <label for="bio" class="bb-profile--info__title fz-14 text-center fst-italic">Bio</label>
+                            <div class="form-group">
+                                <textarea class="form-control fz-16 fw-medium text-center" id="bio" rows="6"
+                                    disabled>Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="file" id="fileInput" style="display: none;" accept="image/*"
+                        onchange="handleImageChange(this)">
+
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="#" class="home-logo">
+                    <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
+                    <span class="nav__text">HOME</span>
+                </a>
+                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
+                    <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
+                    <span class="nav__text">NEIGHBORHOOD</span>
+                </a>
+                <a href="{% url 'backend:findfriend' %}" class="nav__link ">
+                    <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
+                    <span class="nav__text">FINDFRIENDS</span>
+                </a>
+                <a href="#" class="nav__link">
+                    <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
+                    <span class="nav__text">BLINKBOARD</span>
+                </a>
+            </nav>
+        </div>
+        <div class="col-sm-9 p-5 " style="display: grid; align-items: center; height: 100vh;">
+            <div class="bb-content-wrapper  " style="overflow: hidden;">
+                <div class="bb-content__inner  my-auto">
+                    <div class="bb-home--wrapper m-4 mx-auto ">
+                        <!-- home screen header  -->
+                        <div class="bb-home--header  justify-content-md-between align-items-center mb-4" style="display: flex;">
+                            <div class="bb-update__blinkboard-btn bb-home__header-left button__main btn btn-primary fz-12 width-150"
+                                onclick="toggleContentEditable()">
+                                UPDATE BLINKBOARD
+                            </div>
+                            <div class="bb-home__header-right date__blinkboard fz-16 fw-semibold">
+                                <span>Posted on</span><span id="updateDate">10-01-2024</span><span>@</span><span
+                                    id="updateTime">5:34pm</span>
+                                <span>PST</span>
+                            </div>
+                        </div>
+                        <!-- home screen content  -->
+                        <div class="bb-home__content-wrapper">
+                            <div class="bb-home__content-inner" style="border-radius: 10px;">
+                                <div class="bb-blinkboard--content p-md-3 p-2 border border-2 border-dark rounded-medium"
+                                    id="editableContent" contenteditable="false">
+                                    <p id="blinkboardContent" class="fz-22 text-center fw-semibold m-0">
+                                        Hey Everyone, just wrapped a really cool shoot. Amazing Yoga studio space in
+                                        Eagle Rock with a ton of natural lighting. I had the opportunity to shoot with
+                                        my new sony FS7 and edit together a short commercial that will be added to
+                                        studio's youtube channel. I'll post the link once we have it up.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- home screen image  -->
+                        <div class="bb-home__footer d-flex align-items-center flex-wrap">
+                            <div class="col-md-2 col-1">&nbsp;</div>
+                            <div class="col-sm-6">
+                                <div class="bb-home__image-wrapper p-5">
+                                    <div class="bb-home__image-inner">
+                                        <div class="bb-blinkboard--image " id="imageWrapper"
+                                            style="height: 250px; width: 250px; float: right;">
+                                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/DEFAULTPIC.png " alt="blinkboard_image"
+                                                class="user_blinkboard--image" id="userImage"
+                                                style="height: 100%; width: 100%; " />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-s6 ">
+                                <div class="bb-update__blinkboard-img bb-home__footer-right button__main btn btn-primary fz-12 width-150"
+                                    onclick="toggleImageEditable()">
+                                    UPDATE NEW IMAGE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+\
+<script>
+    function toggleContentEditable() {
+        var contentElement = document.getElementById("editableContent");
+        var dateElement = document.getElementById("updateDate");
+        var timeElement = document.getElementById("updateTime");
+
+        // Toggle the contenteditable attribute
+        var isEditable = contentElement.getAttribute("contenteditable") === "true";
+        contentElement.setAttribute("contenteditable", !isEditable);
+
+        // Change button text based on edit mode
+        var buttonText = isEditable ? "UPDATE BLINKBOARD" : "SAVE CHANGES";
+        document.querySelector(".bb-update__blinkboard-btn").innerText = buttonText;
+
+        // Update date and time when saving changes
+        if (!isEditable) {
+            var currentDate = new Date();
+            var formattedDate = currentDate.toLocaleDateString('en-US');
+            var formattedTime = currentDate.toLocaleTimeString('en-US');
+            dateElement.innerText = formattedDate;
+            timeElement.innerText = formattedTime;
+        }
+    }
+
+    function toggleImageEditable() {
+        var imageWrapper = document.getElementById("imageWrapper");
+        var userImage = document.getElementById("userImage");
+        var updateImageButton = document.querySelector(".bb-update__blinkboard-img");
+
+        // Check if in edit mode
+        var isEditable = updateImageButton.innerText === "SAVE IMAGE";
+
+        if (!isEditable) {
+            // Create an input element of type file
+            var fileInput = document.createElement("input");
+            fileInput.type = "file";
+
+            // Add event listener to handle file selection
+            fileInput.addEventListener("change", function (event) {
+                var file = event.target.files[0];
+
+                if (file) {
+                    // Update image source with the selected file
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        userImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Change button text
+                    updateImageButton.innerText = "SAVE IMAGE";
+                }
+            });
+
+            // Trigger click event on the file input
+            fileInput.click();
+        } else {
+            // Save the changes or perform any other necessary actions
+            // For now, we're just changing the button text back to "UPDATE NEW IMAGE"
+            updateImageButton.innerText = "UPDATE NEW IMAGE";
+        }
+    }
+</script>
+<script>
+    function toggleEdit() {
+        const editButton = document.getElementById("editButton");
+        const buttonText = editButton.querySelector(".btn").innerHTML.trim();
+
+        const form = document.getElementById("profileForm");
+        const inputs = form.getElementsByTagName("input");
+        const textareas = form.getElementsByTagName("textarea");
+        const imageContainer = document.getElementById("profileImageContainer");
+        const imageOverlay = document.getElementById("imageOverlay");
+        const changeImageButton = document.querySelector(".change-image-button");
+
+        if (buttonText === "EDIT PROFILE") {
+            // Change button text to "Save Changes"
+            editButton.innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="saveChanges()">SAVE CHANGES</button>';
+
+            // Enable input fields for editing
+            for (let input of inputs) {
+                input.removeAttribute("disabled");
+            }
+
+            for (let textarea of textareas) {
+                textarea.removeAttribute("disabled");
+            }
+
+            // Show change image button
+            changeImageButton.style.display = "block";
+
+            // Show image overlay with replace icon
+            imageOverlay.style.display = "flex";
+        } else {
+            // Change button text back to "Edit Profile"
+            editButton.innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT PROFILE</button>';
+
+            // Disable input fields after saving changes
+            for (let input of inputs) {
+                input.setAttribute("disabled", true);
+            }
+
+            for (let textarea of textareas) {
+                textarea.setAttribute("disabled", true);
+            }
+
+            // Hide change image button
+            changeImageButton.style.display = "none";
+
+            // Hide image overlay with replace icon
+            imageOverlay.style.display = "none";
+        }
+    }
+
+    function triggerFileInput() {
+        // Trigger the file input when clicking on the replace icon
+        document.getElementById("fileInput").click();
+    }
+
+    function handleImageChange(input) {
+        const file = input.files[0];
+
+        if (file) {
+            // Display the selected image in the profile image container
+            const profileImage = document.getElementById("profileImage");
+            profileImage.src = URL.createObjectURL(file);
+
+            // Optional: Show the change image button
+            document.querySelector(".change-image-button").style.display = "block";
+        }
+    }
+
+    function changeImage() {
+        // Trigger file input to allow image change
+        triggerFileInput();
+    }
+
+    function saveChanges() {
+        // Add logic to save the data and selected image (send to server, update database, etc.)
+        // For demonstration purposes, we'll just log the data to the console.
+        console.log("Changes saved!");
+        console.log("Location: " + document.getElementById("location").value);
+        console.log("Quote: " + document.getElementById("quote").value);
+        console.log("Bio: " + document.getElementById("bio").value);
+        console.log("Selected Image: " + document.getElementById("profileImage").src);
+
+        // Change button text back to "Edit Profile"
+        document.getElementById("editButton").innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT PROFILE</button>';
+
+        // Disable input fields after saving changes
+        const form = document.getElementById("profileForm");
+        const inputs = form.getElementsByTagName("input");
+        const textareas = form.getElementsByTagName("textarea");
+
+        for (let input of inputs) {
+            input.setAttribute("disabled", true);
+        }
+
+        for (let textarea of textareas) {
+            textarea.setAttribute("disabled", true);
+        }
+
+        // Hide change image button
+        document.querySelector(".change-image-button").style.display = "none";
+
+        // Hide image overlay with replace icon
+        document.getElementById("imageOverlay").style.display = "none";
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+</html>
