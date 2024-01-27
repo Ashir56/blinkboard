@@ -33,7 +33,7 @@ class User(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     quote = models.CharField(max_length=500, null=True, blank=True)
     bio = models.CharField(max_length=500, null=True, blank=True)
-    avatar = models.ImageField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     blink_board = models.CharField(max_length=1000, null=True, blank=True)
 
 
@@ -41,3 +41,11 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+
+
+class Friend(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='friendship')
+    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_friends')
+
+    def __str__(self):
+        return f"{self.user.user.username} - {self.friend.user.username}"

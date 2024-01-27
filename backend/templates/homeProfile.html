@@ -300,9 +300,9 @@
                     <div class="bb-username--wrapper mb-4">
                         <h3 class="fz-18 fw-semibold text-center">@DanIsaRockstar</h3>
                     </div>
-                    <div class="bb-profie--info__wrapper">
+                    <div id="profile-form" class="bb-profie--info__wrapper">
                         <div class="profile-image-container" id="profileImageContainer">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/DEFAULTPIC.png" alt="Profile Image" class="profile-image" id="profileImage" />
+                            <img src="{{ user.avatar }}" alt="Profile Image" class="profile-image" id="profileImage" />
                             <div class="overlay" id="imageOverlay">
                                 <div class="replace-icon" onclick="triggerFileInput()">
                                     <img style="height: 250px; width: 250px;" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDPROFILEPIC.png"
@@ -312,10 +312,8 @@
                             <div class="change-image-button" onclick="changeImage()"></div>
                         </div>
 
-                        <div class="bb-update__linkboard-btn text-center my-4 bb-home__header-left button__main fz-12"
-                            id="editButton">
-                            <button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT
-                                PROFILE</button>
+                        <div class="bb-update__linkboard-btn text-center my-4 bb-home__header-left button__main fz-12">
+                            <button class="btn btn-primary fz-12 width-120" id="editButton" onclick="toggleEdit()">EDIT PROFILE</button>
                         </div>
 
                         <div class="profile-form" id="profileForm">
@@ -324,24 +322,23 @@
                                 class="bb-profile--info__title fz-14 text-center fw-reg fst-italic mb-2">Location:</label>
                             <div class="form-group">
                                 <input type="text" class="form-control fz-18 fw-semibold text-center" id="location"
-                                    value="LOS ANGELES, CA" disabled>
+                                    value="{{ user.location }}" disabled>
                             </div>
 
                             <label for="quote"
                                 class="bb-profile--info__title fz-14 text-center fst-italic">Quote</label>
                             <div class="form-group">
                                 <textarea class="form-control fz-16 fw-medium text-center" id="quote" rows="4"
-                                    disabled>Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are.</textarea>
+                                    disabled>{{ user.quote}}</textarea>
                             </div>
 
                             <label for="bio" class="bb-profile--info__title fz-14 text-center fst-italic">Bio</label>
                             <div class="form-group">
                                 <textarea class="form-control fz-16 fw-medium text-center" id="bio" rows="6"
-                                    disabled>Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are. Always Be A good is not be a good so be as you are.</textarea>
+                                    disabled>{{ user.bio }}</textarea>
                             </div>
                         </div>
                     </div>
-
                     <input type="file" id="fileInput" style="display: none;" accept="image/*"
                         onchange="handleImageChange(this)">
 
@@ -425,7 +422,6 @@
     </div>
 
 </body>
-\
 <script>
     function toggleContentEditable() {
         var contentElement = document.getElementById("editableContent");
@@ -462,7 +458,7 @@
             // Create an input element of type file
             var fileInput = document.createElement("input");
             fileInput.type = "file";
-
+            console.log("1st")
             // Add event listener to handle file selection
             fileInput.addEventListener("change", function (event) {
                 var file = event.target.files[0];
@@ -488,11 +484,10 @@
             updateImageButton.innerText = "UPDATE NEW IMAGE";
         }
     }
-</script>
-<script>
+
     function toggleEdit() {
         const editButton = document.getElementById("editButton");
-        const buttonText = editButton.querySelector(".btn").innerHTML.trim();
+        const buttonText = editButton.innerHTML.trim();
 
         const form = document.getElementById("profileForm");
         const inputs = form.getElementsByTagName("input");
@@ -503,7 +498,7 @@
 
         if (buttonText === "EDIT PROFILE") {
             // Change button text to "Save Changes"
-            editButton.innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="saveChanges()">SAVE CHANGES</button>';
+            editButton.innerHTML = '<button class="btn btn-primary fz-12 width-120">SAVE CHANGES</button>';
 
             // Enable input fields for editing
             for (let input of inputs) {
@@ -519,7 +514,11 @@
 
             // Show image overlay with replace icon
             imageOverlay.style.display = "flex";
-        } else {
+        }
+        else {
+            console.log("HELLO")
+            saveProfileChanges()
+
             // Change button text back to "Edit Profile"
             editButton.innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT PROFILE</button>';
 
@@ -537,8 +536,10 @@
 
             // Hide image overlay with replace icon
             imageOverlay.style.display = "none";
+
+
         }
-    }
+        }
 
     function triggerFileInput() {
         // Trigger the file input when clicking on the replace icon
@@ -563,37 +564,72 @@
         triggerFileInput();
     }
 
-    function saveChanges() {
-        // Add logic to save the data and selected image (send to server, update database, etc.)
-        // For demonstration purposes, we'll just log the data to the console.
-        console.log("Changes saved!");
-        console.log("Location: " + document.getElementById("location").value);
-        console.log("Quote: " + document.getElementById("quote").value);
-        console.log("Bio: " + document.getElementById("bio").value);
-        console.log("Selected Image: " + document.getElementById("profileImage").src);
-
-        // Change button text back to "Edit Profile"
-        document.getElementById("editButton").innerHTML = '<button class="btn btn-primary fz-12 width-120" onclick="toggleEdit()">EDIT PROFILE</button>';
-
-        // Disable input fields after saving changes
-        const form = document.getElementById("profileForm");
-        const inputs = form.getElementsByTagName("input");
-        const textareas = form.getElementsByTagName("textarea");
-
-        for (let input of inputs) {
-            input.setAttribute("disabled", true);
+    function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
-
-        for (let textarea of textareas) {
-            textarea.setAttribute("disabled", true);
-        }
-
-        // Hide change image button
-        document.querySelector(".change-image-button").style.display = "none";
-
-        // Hide image overlay with replace icon
-        document.getElementById("imageOverlay").style.display = "none";
     }
+    return cookieValue;
+    }
+
+    function saveProfileChanges() {
+    var location = document.getElementById("location").value;
+    var quote = document.getElementById("quote").value;
+    var bio = document.getElementById("bio").value;
+
+    var data = {
+        location: location,
+        quote: quote,
+        bio: bio,
+    };
+
+    var csrftoken = getCookie('csrftoken');
+    console.log("CSRF: " + csrftoken);
+
+    var updateUrl = "{% url 'backend:update' %}";
+
+    // Use the fetch function to make the AJAX request
+    fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            // Update HTML with the new user data
+            document.getElementById("location").value = response.user.location;
+            document.getElementById("quote").value = response.user.quote;
+            document.getElementById("bio").value = response.user.bio;
+
+            console.log('Profile updated successfully!');
+            // Optionally display a success message or perform additional actions
+        } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
+}
+
 </script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
