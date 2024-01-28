@@ -288,11 +288,11 @@
                 <div class="bb-nav__inner">
                     <div class="d-flex align-items-center " style="justify-content: center;">
                         <!-- Logo 1 -->
-                        <a href="#"><img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/HOME.png" alt="Logo 1" class="img-fluid mb-3 mx-2"
+                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid mb-3 mx-2"
                                 style="height: 100px;min-width: 100px; float: left;"></a>
 
                         <!-- Logo 2 -->
-                        <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/BLINKBOARDLOGO.png" alt="Logo 2" class="iuid "
+                        <img src="{% static 'backend/Graphics/BLINKBOARDLOGO.png' %}" alt="Logo 2" class="iuid "
                             style="width: 200px; text-align: center; flex-shrink: 0;">
                     </div>
 
@@ -302,7 +302,7 @@
                     </div>
                     <div id="profile-form" class="bb-profie--info__wrapper">
                         <div class="profile-image-container" id="profileImageContainer">
-                            <img src="{{ user.avatar }}" alt="Profile Image" class="profile-image" id="profileImage" />
+                            <img src="{{ user.avatar.url }}" alt="Profile Image" class="profile-image" id="profileImage" />
                             <div class="overlay" id="imageOverlay">
                                 <div class="replace-icon" onclick="triggerFileInput()">
                                     <img style="height: 250px; width: 250px;" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDPROFILEPIC.png"
@@ -369,10 +369,7 @@
                     <div class="bb-home--wrapper m-4 mx-auto ">
                         <!-- home screen header  -->
                         <div class="bb-home--header  justify-content-md-between align-items-center mb-4" style="display: flex;">
-                            <div class="bb-update__blinkboard-btn bb-home__header-left button__main btn btn-primary fz-12 width-150"
-                                onclick="toggleContentEditable()">
-                                UPDATE BLINKBOARD
-                            </div>
+                            <button class="btn btn-primary bb-update__blinkboard-btn bb-home__header-left button__main btn btn-primary fz-12 width-150" onclick="toggleContentEditable()">UPDATE BLINKBOARD</button>
                             <div class="bb-home__header-right date__blinkboard fz-16 fw-semibold">
                                 <span>Posted on</span><span id="updateDate">10-01-2024</span><span>@</span><span
                                     id="updateTime">5:34pm</span>
@@ -385,10 +382,7 @@
                                 <div class="bb-blinkboard--content p-md-3 p-2 border border-2 border-dark rounded-medium"
                                     id="editableContent" contenteditable="false">
                                     <p id="blinkboardContent" class="fz-22 text-center fw-semibold m-0">
-                                        Hey Everyone, just wrapped a really cool shoot. Amazing Yoga studio space in
-                                        Eagle Rock with a ton of natural lighting. I had the opportunity to shoot with
-                                        my new sony FS7 and edit together a short commercial that will be added to
-                                        studio's youtube channel. I'll post the link once we have it up.
+                                        {{ user.blink_board }}
                                     </p>
                                 </div>
                             </div>
@@ -401,14 +395,15 @@
                                     <div class="bb-home__image-inner">
                                         <div class="bb-blinkboard--image " id="imageWrapper"
                                             style="height: 250px; width: 250px; float: right;">
-                                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/DEFAULTPIC.png " alt="blinkboard_image"
-                                                class="user_blinkboard--image" id="userImage"
+                                            <img src="{{ user.blink_board_image }}" alt="blinkboard_image"
+                                                class="user_blinkboard--image" id="blinkBoardImage"
                                                 style="height: 100%; width: 100%; " />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-s6 ">
+                                <input type="file" id="fileInputForImage" accept="image/*" style="display: none;" onchange="handleImageChange(this)">
                                 <div class="bb-update__blinkboard-img bb-home__footer-right button__main btn btn-primary fz-12 width-150"
                                     onclick="toggleImageEditable()">
                                     UPDATE NEW IMAGE
@@ -444,11 +439,55 @@
             dateElement.innerText = formattedDate;
             timeElement.innerText = formattedTime;
         }
+        else{
+            var data =  document.getElementById("editableContent").innerText;
+            console.log(data)
+            var csrftoken = getCookie('csrftoken');
+
+    var updateUrl = "{% url 'backend:update' %}";
+
+    // Use the fetch function to make the AJAX request
+    fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+        'Authorization': 'Bearer ' + "{{ access_token }}",
+        },
+        body: JSON.stringify({
+        blink_board: data
+    }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            // Update HTML with the new user data
+            document.getElementById("location").value = response.user.location;
+            document.getElementById("quote").value = response.user.quote;
+            document.getElementById("bio").value = response.user.bio;
+
+            console.log('Profile updated successfully!');
+            // Optionally display a success message or perform additional actions
+        } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
+        }
     }
 
     function toggleImageEditable() {
         var imageWrapper = document.getElementById("imageWrapper");
-        var userImage = document.getElementById("userImage");
+        var userImage = document.getElementById("blinkBoardImage");
         var updateImageButton = document.querySelector(".bb-update__blinkboard-img");
 
         // Check if in edit mode
@@ -457,8 +496,8 @@
         if (!isEditable) {
             // Create an input element of type file
             var fileInput = document.createElement("input");
+
             fileInput.type = "file";
-            console.log("1st")
             // Add event listener to handle file selection
             fileInput.addEventListener("change", function (event) {
                 var file = event.target.files[0];
@@ -479,9 +518,57 @@
             // Trigger click event on the file input
             fileInput.click();
         } else {
-            // Save the changes or perform any other necessary actions
-            // For now, we're just changing the button text back to "UPDATE NEW IMAGE"
-            updateImageButton.innerText = "UPDATE NEW IMAGE";
+            var fileInput = document.getElementById('blinkBoardImage');
+            console.log(fileInput);  // Check if fileInput is not null
+console.log(fileInput.files);  // Check if files property is accessible
+console.log(fileInput.files[0]);
+            var formData = new FormData();
+
+            if (fileInput.files.length > 0) {
+                    formData.append('blink_board_image', fileInput.files[0]);
+                    }
+            console.log(formData)
+
+
+
+    var csrftoken = getCookie('csrftoken');
+
+    var updateUrl = "{% url 'backend:update' %}";
+
+    // Use the fetch function to make the AJAX request
+    fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+        'X-CSRFToken': csrftoken,
+        'Authorization': 'Bearer ' + "{{ access_token }}",
+        },
+        body: formData,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            // Update HTML with the new user data
+            document.getElementById("location").value = response.user.location;
+            document.getElementById("quote").value = response.user.quote;
+            document.getElementById("bio").value = response.user.bio;
+
+            console.log('Profile updated successfully!');
+            // Optionally display a success message or perform additional actions
+        } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
+        updateImageButton.innerText = "UPDATE NEW IMAGE";
         }
     }
 
@@ -516,7 +603,6 @@
             imageOverlay.style.display = "flex";
         }
         else {
-            console.log("HELLO")
             saveProfileChanges()
 
             // Change button text back to "Edit Profile"
@@ -548,6 +634,8 @@
 
     function handleImageChange(input) {
         const file = input.files[0];
+
+        console.log("ImageD" + file)
 
         if (file) {
             // Display the selected image in the profile image container
@@ -584,14 +672,21 @@
     var quote = document.getElementById("quote").value;
     var bio = document.getElementById("bio").value;
 
-    var data = {
-        location: location,
-        quote: quote,
-        bio: bio,
-    };
+    var formData = new FormData();
+    formData.append('location', location);
+    formData.append('quote', quote);
+    formData.append('bio', bio);
+
+    // Get the file input element
+    var fileInput = document.getElementById("fileInput");
+    // Check if a file is selected
+    if (fileInput.files.length > 0) {
+        // Append the file to the FormData object
+        formData.append('avatar', fileInput.files[0]);
+    }
+
 
     var csrftoken = getCookie('csrftoken');
-    console.log("CSRF: " + csrftoken);
 
     var updateUrl = "{% url 'backend:update' %}";
 
@@ -599,10 +694,10 @@
     fetch(updateUrl, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken,
+        'X-CSRFToken': csrftoken,
+        'Authorization': 'Bearer ' + "{{ access_token }}",
         },
-        body: JSON.stringify(data),
+        body: formData,
     })
     .then(response => {
         if (!response.ok) {

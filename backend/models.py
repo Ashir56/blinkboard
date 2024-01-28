@@ -31,10 +31,12 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    location = models.CharField(max_length=1000, null=True, blank=True)
     quote = models.CharField(max_length=500, null=True, blank=True)
     bio = models.CharField(max_length=500, null=True, blank=True)
     avatar = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     blink_board = models.CharField(max_length=1000, null=True, blank=True)
+    blink_board_image = models.ImageField(upload_to='blink_board_image', null=True, blank=True)
 
 
     objects = UserManager()

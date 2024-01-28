@@ -98,6 +98,9 @@ LOGIN_URL = 'backend:login'  # Use the name of your login view, including the ap
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = 'None'
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 10  # 10 MB
+# settings.py
+MEDIA_URL = '/media/'
 
 
 # myproject/settings.py

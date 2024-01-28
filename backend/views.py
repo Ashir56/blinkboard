@@ -8,26 +8,50 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
 
+@csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
-@csrf_exempt
 def login_view(request):
-
     if request.method == 'GET':
         return render(request, 'login.html')
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    elif request.method == 'POST':
+        username = request.data.get('username')
+        password = request.data.get('password')
 
         user = authenticate(username=username, password=password)
+
         if user:
             login(request, user)
-            context = {'user': user}
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            context = {
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'location': user.location,
+                    'bio': user.bio,
+                    'quote': user.quote,
+                    'avatar': user.avatar,
+                    'blink_board': user.blink_board,
+                    'blink_board_image': user.blink_board_image
+                },
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+            }
+
+            # return Response(context)
+
+            # Render the desired template, for example 'homeProfile.html'
             return render(request, 'homeProfile.html', context)
         else:
             return HttpResponseBadRequest('Login Failed')
@@ -53,10 +77,8 @@ def sign_up(request):
 
 
 @api_view(['POST', 'GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def update_user(request):
-    print(request)
-    print("User in update_user:", request.user)
 
     if request.method == 'GET':
         user = request.user
@@ -64,29 +86,43 @@ def update_user(request):
 
     if request.method == 'POST':
         user = request.user
-        print("Hello")
-
-        # Check if the user is authenticated
         if user.is_authenticated:
-            print("User is authenticated!")
-            location = request.POST.get("location")
-            bio = request.POST.get("bio")
-            quote = request.POST.get("quote")
-            user.bio = bio
-            user.location = location
-            user.quote = quote
+            location = request.data.get("location", None)
+
+            bio = request.data.get("bio", None)
+            quote = request.data.get("quote", None)
+            if location and len(location) > 0:
+                user.location = location
+
+            if bio and len(bio) > 0:
+                user.bio = bio
+            if quote and len(quote) > 0:
+                user.quote = quote
+
+            avatar_file = request.FILES.get('avatar')
+            if avatar_file:
+                if avatar_file.size > 0:
+                    user.avatar.save(avatar_file.name, avatar_file, save=True)
+                else:
+                    print("Uploaded file is empty.")
+
+            blink_board = request.data.get('blink_board', None)
+            print(blink_board)
+            if blink_board and len(blink_board) > 0:
+                user.blink_board = blink_board
+
+            avatar_file = request.FILES.get('blink_board_image')
+            if avatar_file:
+                if avatar_file.size > 0:
+                    user.avatar.save(avatar_file.name, avatar_file, save=True)
+                else:
+                    print("Uploaded file is empty.")
             user.save()
-            user_data = {
-                'id': user.id,
-                'username': user.username,
-                'location': user.location,
-                'quote': user.quote,
-                'bio': user.bio,
-            }
-            return JsonResponse({'success': True, 'user': user_data})
+            return render(request, 'homeProfile.html', context={'user': user})
         else:
             print("User not authenticated!")
             return JsonResponse({'success': False, 'error': 'User not authenticated'}, status=401)
+
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
