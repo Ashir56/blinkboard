@@ -38,16 +38,50 @@ class User(AbstractBaseUser):
     blink_board = models.CharField(max_length=1000, null=True, blank=True)
     blink_board_image = models.ImageField(upload_to='blink_board_image', null=True, blank=True)
 
-
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
 
+from django.db import models
+
 class Friend(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='friendship')
-    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_friends')
+    PENDING = 'Pending'
+    ACCEPTED = 'Accepted'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_user')
+    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_friend')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+
+    class Meta:
+        # Define a unique constraint to create a composite primary key
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'friend'], name='unique_friendship'),
+        ]
 
     def __str__(self):
-        return f"{self.user.user.username} - {self.friend.user.username}"
+        return f"{self.user.username} - {self.friend.username}"
+
+
+
+# class FriendRequest(models.Model):
+#     PENDING = 'Pending'
+#     ACCEPTED = 'Accepted'
+#     REJECTED = 'Rejected'
+#     STATUS_CHOICES = [
+#         (PENDING, 'Pending'),
+#         (ACCEPTED, 'Accepted'),
+#         (REJECTED, 'Rejected'),
+#     ]
+#
+#     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_requests')
+#     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_requests')
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+#
+#     def __str__(self):
+#         return f"{self.from_user.username} to {self.to_user.username} - {self.status}"

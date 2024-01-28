@@ -3,7 +3,7 @@ import time
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from .models import User, Friend
 
 
 @csrf_exempt
@@ -41,7 +41,7 @@ def login_view(request):
                     'location': user.location,
                     'bio': user.bio,
                     'quote': user.quote,
-                    'avatar': user.avatar,
+                    'avatar': user.avatar if user.avatar else None,
                     'blink_board': user.blink_board,
                     'blink_board_image': user.blink_board_image
                 },
@@ -79,7 +79,6 @@ def sign_up(request):
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def update_user(request):
-
     if request.method == 'GET':
         user = request.user
         return render(request, 'homeProfile.html', {'user': user})
@@ -107,7 +106,6 @@ def update_user(request):
                     print("Uploaded file is empty.")
 
             blink_board = request.data.get('blink_board', None)
-            print(blink_board)
             if blink_board and len(blink_board) > 0:
                 user.blink_board = blink_board
 
@@ -136,3 +134,59 @@ def neighbourhood(request):
 def findfriend(request):
     if request.method == 'GET':
         return render(request, 'findfriend.html')
+
+@api_view(['POST', 'GET'])
+@permission_classes([AllowAny])
+def blinkboard(request):
+    if request.method == 'GET':
+        user = request.user
+        neighbours = User.objects.filter(location__icontains=user.location).exclude(username=user.username)
+
+        context = {
+            'neighbours': neighbours
+        }
+        print(neighbours)
+        return render(request, 'blinkboard.html', context=context)
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def filter_friend(request):
+    if request.method == 'GET':
+        user_name = request.GET.get('username')
+        print(user_name)
+        users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
+        print(users)
+        user_list = []
+
+        for user in users:
+            user_data = {'username': user.username}
+
+            # Check if the avatar field has a file associated with it
+            if user.avatar and user.avatar.file:
+                user_data['avatar'] = user.avatar.url
+            else:
+                user_data['avatar'] = None  # Or any default value you prefer
+
+            user_list.append(user_data)
+        return JsonResponse({'success': True, 'users': user_list})
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def send_friend_request(request):
+    if request.method == 'POST':
+        requested_username = request.data.get('username')
+        user_name = request.user
+
+        # Retrieve the User instance for the requested username
+        user = User.objects.get(username=requested_username)
+        # Check if the friendship already exists
+        if not Friend.objects.filter(user=user_name, friend=user).exists():
+            # Create a Friend instance with the correct User instances
+            Friend.objects.create(user=user_name, friend=user)
+
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'already_friends'})
+    else:
+            return JsonResponse(500)

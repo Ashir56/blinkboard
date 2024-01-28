@@ -483,7 +483,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="#" class="nav__link">
+                <a class="nav__link" href="{% url 'backend:blinkboard' %}" id="blinkboard-link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -500,41 +500,7 @@
                     </div>
 
                     <div class="image-container" id="imageContainer" style="margin-top: 20px;">
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 1</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 1</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 1</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image3</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 1</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 1</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" alt="Image 1" class="image">
-                            <div class="image-name">Image 5</div>
-                            <img class="myImage" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png" alt="Original Image">
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -548,39 +514,142 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <script>
-    function filterImages() {
-        const searchInput = document.getElementById("apiSearch").value.toLowerCase();
-        const imageContainer = document.getElementById("imageContainer");
-        const imageWrappers = imageContainer.getElementsByClassName("image-wrapper");
 
-        for (const wrapper of imageWrappers) {
-            const imageName = wrapper.getElementsByClassName("image-name")[0].innerText.toLowerCase();
-            const displayStyle = imageName.includes(searchInput) ? "block" : "none";
-            wrapper.style.display = displayStyle;
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
-    }
 
 
+function filterImages() {
+    const searchInput = document.getElementById("apiSearch").value.toLowerCase();
+    const imageContainer = document.getElementById("imageContainer");
+    const imageWrappers = imageContainer.getElementsByClassName("image-wrapper");
 
-</script>
 
-<script>
+    var csrftoken = getCookie('csrftoken');
+    var access_token = getCookie('access_token')
+    var updateUrl = "{% url 'backend:filterfriend' %}?username=" + searchInput
+    // Use the fetch function to make the AJAX request
+    fetch(updateUrl, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Authorization': 'Bearer ' + access_token,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Clear existing content
+                imageContainer.innerHTML = '';
 
-    // Use event delegation to handle click events on the container
-    document.getElementById("imageContainer").addEventListener("click", function (event) {
-        // Check if the clicked element has the 'myImage' class
-        if (event.target.classList.contains("myImage")) {
-            changeImage(event.target);
+                // Iterate over users and update HTML content
+                data.users.forEach(user => {
+                    const userWrapper = document.createElement('div');
+                    userWrapper.className = 'image-wrapper';
+
+                    const userImage = document.createElement('img');
+                    userImage.src = user.avatar;
+                    userImage.alt = 'Profile Image';
+                    userImage.className = 'image';
+
+                    const userName = document.createElement('div');
+                    userName.className = 'image-name';
+                    userName.textContent = user.username;
+
+                    const img = document.createElement('img');
+                    img.src = "{% static 'backend/Graphics/ADDBUTTON.png' %}"
+                    img.className = 'myImage';
+                    img.onclick = () => sendFriendRequest(user.username, img);
+
+                    // Append elements to userWrapper
+                    userWrapper.appendChild(userImage);
+                    userWrapper.appendChild(userName);
+                    userWrapper.appendChild(img);
+
+                    // Append userWrapper to imageContainer
+                    imageContainer.appendChild(userWrapper);
+                });
+                }
+             else {
+                console.error('Profile update failed:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+}
+
+function sendFriendRequest(user, imgClicked) {
+    var requestURL = "{% url 'backend:send_friend_request' %}"
+    var access_token = getCookie('access_token')
+
+    fetch(requestURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'), // Ensure you have a function to get CSRF token
+            'Authorization': 'Bearer ' + access_token,
+        },
+        body: JSON.stringify({
+                username: user
+            }),
+    })
+.then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        // Handle the response data as needed
+        console.log(data);
+        console.log(imgClicked);
+        if(imgClicked){
+            imgClicked.src="{% static 'backend/Graphics/CHECKMARK.png' %}"
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
+}
 
-    function changeImage(imgElement) {
-        // Check the current source and change it to the appropriate image
-        if (imgElement.src.match("/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDBUTTON.png")) {
-            imgElement.src = "/Users/apple/Desktop/Blinkboard (1)/Graphics/CHECKMARK.png"; // Replace with the path to your new image
-        }
-    }
+document.getElementById('blinkboard-link').addEventListener('click', function (event) {
+        // Prevent the default link behavior (prevent navigation)
+        event.preventDefault();
 
+        // Make a GET request to the blinkboard URL with the authentication token in the headers
+        fetch(this.href, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + getCookie("access_token")  // Include the authentication token in the headers
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data as needed
+            console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
+    });
 </script>
 
 </html>

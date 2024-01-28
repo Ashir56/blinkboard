@@ -298,7 +298,7 @@
 
 
                     <div class="bb-username--wrapper mb-4">
-                        <h3 class="fz-18 fw-semibold text-center">@DanIsaRockstar</h3>
+                        <h3 class="fz-18 fw-semibold text-center">@{{ user.username }}</h3>
                     </div>
                     <div id="profile-form" class="bb-profie--info__wrapper">
                         <div class="profile-image-container" id="profileImageContainer">
@@ -357,7 +357,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="#" class="nav__link">
+                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -403,7 +403,7 @@
                                 </div>
                             </div>
                             <div class="col-s6 ">
-                                <input type="file" id="fileInputForImage" accept="image/*" style="display: none;" onchange="handleImageChange(this)">
+                                <input type="file" id="fileInputForImage" accept="image/*" style="display: none;" onchange="handleImageChanging(this)">
                                 <div class="bb-update__blinkboard-img bb-home__footer-right button__main btn btn-primary fz-12 width-150"
                                     onclick="toggleImageEditable()">
                                     UPDATE NEW IMAGE
@@ -418,6 +418,8 @@
 
 </body>
 <script>
+    document.cookie = "access_token={{ access_token }}; path=/";
+
     function toggleContentEditable() {
         var contentElement = document.getElementById("editableContent");
         var dateElement = document.getElementById("updateDate");
@@ -518,56 +520,6 @@
             // Trigger click event on the file input
             fileInput.click();
         } else {
-            var fileInput = document.getElementById('blinkBoardImage');
-            console.log(fileInput);  // Check if fileInput is not null
-console.log(fileInput.files);  // Check if files property is accessible
-console.log(fileInput.files[0]);
-            var formData = new FormData();
-
-            if (fileInput.files.length > 0) {
-                    formData.append('blink_board_image', fileInput.files[0]);
-                    }
-            console.log(formData)
-
-
-
-    var csrftoken = getCookie('csrftoken');
-
-    var updateUrl = "{% url 'backend:update' %}";
-
-    // Use the fetch function to make the AJAX request
-    fetch(updateUrl, {
-        method: 'POST',
-        headers: {
-        'X-CSRFToken': csrftoken,
-        'Authorization': 'Bearer ' + "{{ access_token }}",
-        },
-        body: formData,
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(response => {
-        if (response.success) {
-            // Update HTML with the new user data
-            document.getElementById("location").value = response.user.location;
-            document.getElementById("quote").value = response.user.quote;
-            document.getElementById("bio").value = response.user.bio;
-
-            console.log('Profile updated successfully!');
-            // Optionally display a success message or perform additional actions
-        } else {
-            console.error('Profile update failed:', response.error);
-            // Optionally display an error message or perform additional actions
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Handle error
-    });
         updateImageButton.innerText = "UPDATE NEW IMAGE";
         }
     }
@@ -632,9 +584,22 @@ console.log(fileInput.files[0]);
         document.getElementById("fileInput").click();
     }
 
+    function handleImageChanging(input) {
+        const file = input.files[0];
+        console.log("ImageD" + file)
+
+        if (file) {
+            // Display the selected image in the profile image container
+            const profileImage = document.getElementById("profileImage");
+            profileImage.src = URL.createObjectURL(file);
+
+            // Optional: Show the change image button
+            document.querySelector(".change-image-button").style.display = "block";
+        }
+    }
+
     function handleImageChange(input) {
         const file = input.files[0];
-
         console.log("ImageD" + file)
 
         if (file) {

@@ -18,7 +18,7 @@
   <body>
     <section class="bb-main--body">
       {% csrf_token %}
-      <div class="bb--screen-block signup--screen">
+      <div class="bb--screen-block signup--screen" style="margin-top: 30vh; border:none;">
         <div class="bb-signup-screen-container">
           <div class="bb-form-wrapper">
             <div class="bb-signupform__wrapper mx-auto">
@@ -69,7 +69,7 @@
                     <button type="submit" class="btn btn-success btn-block bb-form__btn" id="signup__submit">
                       Signup
                     </button>
-                    <div class="form__alert alert alert-danger mt-3 fz-16 text-center" role="alert">
+                    <div class="form__alert alert alert-danger mt-3 fz-16 text-center" style="display:none;" role="alert">
                        This account already exists,please login
                       </div>
                   </form>
