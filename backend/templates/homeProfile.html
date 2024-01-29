@@ -296,7 +296,6 @@
                             style="width: 200px; text-align: center; flex-shrink: 0;">
                     </div>
 
-
                     <div class="bb-username--wrapper mb-4">
                         <h3 class="fz-18 fw-semibold text-center">@{{ user.username }}</h3>
                     </div>
@@ -395,7 +394,7 @@
                                     <div class="bb-home__image-inner">
                                         <div class="bb-blinkboard--image " id="imageWrapper"
                                             style="height: 250px; width: 250px; float: right;">
-                                            <img src="{{ user.blink_board_image }}" alt="blinkboard_image"
+                                            <img src="{{ user.blink_board_image.url }}" alt="blinkboard_image"
                                                 class="user_blinkboard--image" id="blinkBoardImage"
                                                 style="height: 100%; width: 100%; " />
                                         </div>
@@ -403,7 +402,7 @@
                                 </div>
                             </div>
                             <div class="col-s6 ">
-                                <input type="file" id="fileInputForImage" accept="image/*" style="display: none;" onchange="handleImageChanging(this)">
+                                <input type="file" id="fileInputForBlinkBoardImage" accept="image/*" style="display: none;" onchange="handleImageChanging(this)">
                                 <div class="bb-update__blinkboard-img bb-home__footer-right button__main btn btn-primary fz-12 width-150"
                                     onclick="toggleImageEditable()">
                                     UPDATE NEW IMAGE
@@ -419,6 +418,8 @@
 </body>
 <script>
     document.cookie = "access_token={{ access_token }}; path=/";
+    var selectedFile; // Variable to store the selected file
+
 
     function toggleContentEditable() {
         var contentElement = document.getElementById("editableContent");
@@ -488,39 +489,84 @@
     }
 
     function toggleImageEditable() {
-        var imageWrapper = document.getElementById("imageWrapper");
-        var userImage = document.getElementById("blinkBoardImage");
-        var updateImageButton = document.querySelector(".bb-update__blinkboard-img");
+    var imageWrapper = document.getElementById("imageWrapper");
+    var userImage = document.getElementById("blinkBoardImage");
+    var updateImageButton = document.querySelector(".bb-update__blinkboard-img");
 
-        // Check if in edit mode
-        var isEditable = updateImageButton.innerText === "SAVE IMAGE";
+    // Check if in edit mode
+    var isEditable = updateImageButton.innerText === "SAVE IMAGE";
 
-        if (!isEditable) {
-            // Create an input element of type file
-            var fileInput = document.createElement("input");
+    if (!isEditable) {
+        // Create an input element of type file
+        var fileInput = document.createElement("input");
 
-            fileInput.type = "file";
-            // Add event listener to handle file selection
-            fileInput.addEventListener("change", function (event) {
-                var file = event.target.files[0];
+        fileInput.type = "file";
+        // Add event listener to handle file selection
+        fileInput.addEventListener("change", function (event) {
+            selectedFile = event.target.files[0];
+            console.log("File selected:", selectedFile);
 
-                if (file) {
-                    // Update image source with the selected file
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        userImage.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
+            if (selectedFile) {
+                // Update image source with the selected file
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    userImage.src = e.target.result;
+                };
+                reader.readAsDataURL(selectedFile);
 
-                    // Change button text
-                    updateImageButton.innerText = "SAVE IMAGE";
-                }
-            });
+                // Change button text
+                updateImageButton.innerText = "SAVE IMAGE";
+            }
+        });
 
-            // Trigger click event on the file input
-            fileInput.click();
+        // Trigger click event on the file input
+        fileInput.click();
+    } else {
+        // Access the selected file from the "if" block
+        if (selectedFile) {
+
+        var formData = new FormData();
+        var updateUrl = "{% url 'backend:update' %}";
+        var csrftoken = getCookie('csrftoken');
+        formData.append('blink_board_image', selectedFile);
+
+        fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+        'X-CSRFToken': csrftoken,
+        'Authorization': 'Bearer ' + "{{ access_token }}",
+        },
+        body: formData,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            // Update HTML with the new user data
+            document.getElementById("location").value = response.user.location;
+            document.getElementById("quote").value = response.user.quote;
+            document.getElementById("bio").value = response.user.bio;
+
+            console.log('Profile updated successfully!');
+            // Optionally display a success message or perform additional actions
         } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
+
+            selectedFile = null;
+        }
         updateImageButton.innerText = "UPDATE NEW IMAGE";
+
         }
     }
 

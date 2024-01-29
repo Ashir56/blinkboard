@@ -111,8 +111,9 @@ def update_user(request):
 
             avatar_file = request.FILES.get('blink_board_image')
             if avatar_file:
+                print("AVATAR FILE", avatar_file)
                 if avatar_file.size > 0:
-                    user.avatar.save(avatar_file.name, avatar_file, save=True)
+                    user.blink_board_image.save(avatar_file.name, avatar_file, save=True)
                 else:
                     print("Uploaded file is empty.")
             user.save()
