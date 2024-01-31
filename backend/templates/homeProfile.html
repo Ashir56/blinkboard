@@ -301,7 +301,11 @@
                     </div>
                     <div id="profile-form" class="bb-profie--info__wrapper">
                         <div class="profile-image-container" id="profileImageContainer">
-                            <img src="{{ user.avatar.url }}" alt="Profile Image" class="profile-image" id="profileImage" />
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Profile Image" class="profile-image" id="profileImage" />
+                            {% else %}
+                                <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Default Avatar" width="250" height="250">
+                            {% endif %}
                             <div class="overlay" id="imageOverlay">
                                 <div class="replace-icon" onclick="triggerFileInput()">
                                     <img style="height: 250px; width: 250px;" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDPROFILEPIC.png"
@@ -356,7 +360,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a class="nav__link">
+                <a href="#" class="nav__link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -370,8 +374,8 @@
                         <div class="bb-home--header  justify-content-md-between align-items-center mb-4" style="display: flex;">
                             <button class="btn btn-primary bb-update__blinkboard-btn bb-home__header-left button__main btn btn-primary fz-12 width-150" onclick="toggleContentEditable()">UPDATE BLINKBOARD</button>
                             <div class="bb-home__header-right date__blinkboard fz-16 fw-semibold">
-                                <span>Posted on</span><span id="updateDate">10-01-2024</span><span>@</span><span
-                                    id="updateTime">5:34pm</span>
+                                <span>Posted on</span><span id="updateDate">{{ user.updated_at|date:"F d, Y" }}</span><span>@</span><span
+                                    id="updateTime">{{user.updated_at|time:"h:i A" }}</span>
                                 <span>PST</span>
                             </div>
                         </div>
@@ -394,9 +398,14 @@
                                     <div class="bb-home__image-inner">
                                         <div class="bb-blinkboard--image " id="imageWrapper"
                                             style="height: 250px; width: 250px; float: right;">
-                                            <img src="{{ user.blink_board_image.url }}" alt="blinkboard_image"
+                                            {% if user.blink_board_image %}
+                                                <img src="{{ user.blink_board_image.url }}" alt="blinkboard_image"
                                                 class="user_blinkboard--image" id="blinkBoardImage"
                                                 style="height: 100%; width: 100%; " />
+                                            {% else %}
+                                                <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Default Avatar" width="250" height="250">
+                                            {% endif %}
+
                                         </div>
                                     </div>
                                 </div>
@@ -417,15 +426,18 @@
 
 </body>
 <script>
+
+    var accessToken = getCookie("access_token");
+
+    var blinkboardLink = document.getElementById("blinkboard-link");
+    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
+
     document.cookie = "access_token={{ access_token }}; path=/";
     var selectedFile; // Variable to store the selected file
 
 
     function toggleContentEditable() {
         var contentElement = document.getElementById("editableContent");
-        var dateElement = document.getElementById("updateDate");
-        var timeElement = document.getElementById("updateTime");
-
         // Toggle the contenteditable attribute
         var isEditable = contentElement.getAttribute("contenteditable") === "true";
         contentElement.setAttribute("contenteditable", !isEditable);
@@ -436,11 +448,8 @@
 
         // Update date and time when saving changes
         if (!isEditable) {
-            var currentDate = new Date();
-            var formattedDate = currentDate.toLocaleDateString('en-US');
-            var formattedTime = currentDate.toLocaleTimeString('en-US');
-            dateElement.innerText = formattedDate;
-            timeElement.innerText = formattedTime;
+            console.log("Updating");
+
         }
         else{
             var data =  document.getElementById("editableContent").innerText;

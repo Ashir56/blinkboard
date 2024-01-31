@@ -631,15 +631,19 @@
                             <div class="col-md-4">
                                 <div class="user-info">
                                     <div id="username">@{{ neighbour.username}}</div>
-                                    <img src="assest/Graphics/BLINKBOARDS.png" alt="User Image" width="250" height="250">
+                                    {% if neighbour.avatar %}
+                                        <img src="{{ neighbour.avatar }}" alt="User Image" width="250" height="250">
+                                    {% else %}
+                                        <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Default Avatar" width="250" height="250">
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-8">
                                 <div class="child full-width">
                                     <div class="posted-time-container">
                                         <div class="posted-time d-none d-md-block">
-                                            <span>Posted on</span><span id="updateDate">{{neighbour.updated_at_date}}</span><span>@</span><span
-                                            id="updateTime">{{neighbour.updated_at_time}}</span>
+                                            <span>Posted on</span><span id="updateDate">{{neighbour.updated_at|date:"F d, Y" }}</span><span>@</span><span
+                                            id="updateTime">{{neighbour.updated_at|time:"h:i A" }}</span>
                                         <span>PST</span>
                                         </div>
                                     </div>
@@ -647,7 +651,12 @@
                                         <p>{{ neighbour.blink_board }}</p>
                                     </div>
                                     <div class="image-container">
-                                        <img src="assest/Graphics/BLINKBOARDS.png" alt="Centered Image" width="150" height="150">
+                                        {% if neighbour.blink_board_image %}
+                                            <img src="{{neighbour.blink_board_image}}" alt="Centered Image" width="150" height="150">
+                                        {% else %}
+                                            <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Centered Image" width="150" height="150">
+                                        {% endif %}
+
                                     </div>
                                 </div>
                             </div>

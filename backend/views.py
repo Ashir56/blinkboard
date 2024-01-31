@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from django.contrib.auth import authenticate, login
@@ -9,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from .models import User, Friend
 
@@ -43,7 +44,9 @@ def login_view(request):
                     'quote': user.quote,
                     'avatar': user.avatar if user.avatar else None,
                     'blink_board': user.blink_board,
-                    'blink_board_image': user.blink_board_image
+                    'blink_board_image': user.blink_board_image,
+                    'updated_at': user.updated_at
+
                 },
                 'access_token': access_token,
                 'refresh_token': refresh_token,
@@ -108,6 +111,7 @@ def update_user(request):
             blink_board = request.data.get('blink_board', None)
             if blink_board and len(blink_board) > 0:
                 user.blink_board = blink_board
+                user.updated_at = datetime.datetime.now()
 
             avatar_file = request.FILES.get('blink_board_image')
             if avatar_file:
@@ -136,19 +140,27 @@ def findfriend(request):
         return render(request, 'findfriend.html')
 
 
+from django.core.serializers import serialize
+
+
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def blinkboard(request):
     if request.method == 'GET':
-        # user = request.user
-        # print(user)
-        # neighbours = User.objects.filter(location__icontains=user.location).exclude(username=user.username)
-        #
-        # context = {
-        #     'neighbours': neighbours
-        # }
-        # print(neighbours)
-        return render(request, 'blinkboard.html')
+        access_token = request.GET.get('access_token')
+        decoded_token = AccessToken(access_token)
+
+        user = User.objects.filter(id=decoded_token['user_id']).first()
+
+        neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
+        neighbour_list = [{'username': neighbour.username, 'avatar': neighbour.avatar.url if neighbour.avatar else None,
+                           'blink_board': neighbour.blink_board, 'blink_board_image': neighbour.blink_board_image.url if neighbour.blink_board_image else None,
+                           'updated_at': neighbour.updated_at} for neighbour in
+                          neighbours]
+        context = {
+            'neighbours': neighbour_list
+        }
+        return render(request, 'blinkboard.html', context)
 
 
 @api_view(['POST', 'GET'])

@@ -483,7 +483,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="#" class="nav__link" id="blinkboard-link" onclick="loadBlinkboard()">
+                <a href="#" class="nav__link" id="blinkboard-link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -493,8 +493,7 @@
             <div class="gg">
                 <div class="container" style="margin-bottom: 100px;">
                     <h1 class="mt-5 mb-4 text-center">FIND FRIEND</h1>
-                    <input type="text" class="search-bar" id="apiSearch" placeholder="Search..."
-                       >
+                    <input type="text" class="search-bar" id="apiSearch" placeholder="Search...">
                     <div class="text-center">
                         <button class="btn btn-primary find-button" onclick="filterImages()">Find</button>
                     </div>
@@ -514,6 +513,11 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <script>
+
+    var accessToken = getCookie("access_token");
+
+    var blinkboardLink = document.getElementById("blinkboard-link");
+    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
 
         function getCookie(name) {
             var cookieValue = null;
@@ -631,23 +635,34 @@ function sendFriendRequest(user, imgClicked) {
     });
 }
 
-function loadBlinkboard() {
-    // Make a GET request to the blinkboard URL with the authentication token in the headers
-    fetch("{% url 'backend:blinkboard' %}", {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + getCookie("access_token")  // Include the authentication token in the headers
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle the response data as needed
-        console.log(data);
-        // You might want to redirect or update the page content based on the response
-    })
-    .catch(error => console.error('Error:', error));
-}
+<!--function loadBlinkboard() {-->
+<!--    // Make a GET request to the blinkboard URL with the authentication token in the headers-->
+<!--    fetch("{% url 'backend:blinkboard' %}", {-->
+<!--        method: 'GET',-->
+<!--        headers: {-->
+<!--            'Content-Type': 'application/json',-->
+<!--            'Authorization': 'Bearer ' + getCookie("access_token")  // Include the authentication token in the headers-->
+<!--        },-->
+<!--    })-->
+<!--    .then(response => {-->
+<!--        if (!response.ok) {-->
+<!--            throw new Error(`HTTP error! Status: ${response.status}`);-->
+<!--        }-->
+<!--        return response.text();  // Assuming the response is HTML-->
+<!--    })-->
+<!--    .then(htmlContent => {-->
+<!--        const blob = new Blob([htmlContent], { type: 'text/html' });-->
+
+<!--    // Create a data URL from the blob-->
+<!--    const dataUrl = URL.createObjectURL(blob);-->
+
+<!--    // Change the current location to the data URL-->
+<!--    window.location.href = dataUrl;-->
+
+
+<!--    })-->
+<!--    .catch(error => console.error('Error:', error));-->
+<!--}-->
 </script>
 
 </html>

@@ -521,7 +521,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="{% url 'backend:blinkboard' %}" class="nav__link">
+                <a href="#" class="nav__link" id="blinkboard-link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -712,6 +712,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
+
+    var accessToken = getCookie("access_token");
+
+    var blinkboardLink = document.getElementById("blinkboard-link");
+    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
+
+       function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+    }
+
 document.addEventListener("DOMContentLoaded", function() {
     var image = document.getElementById("zoomImage");
     image.addEventListener("click", function() {
@@ -755,9 +776,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
- </script>
-<script>
-
     $(document).ready(function () {
         // Event handler for clicking on a user profile image
         $('.col-sm-9').on('click', '.neighbor-img', function () {
@@ -780,8 +798,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $('#originalGallery').show();
         });
     });
-</script>
-<script>
+
     function acceptFriendRequest(button) {
         // Get the parent div of the button (which is the column)
         var column = button.parentNode;
@@ -796,8 +813,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         column.remove();
     }
-</script>
-<script>
+
 function deleteUserImage() {
     var userImageDiv = document.getElementById('userImageDiv');
     var detailPage = document.getElementById('detailPage');
