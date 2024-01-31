@@ -111,7 +111,6 @@ def update_user(request):
 
             avatar_file = request.FILES.get('blink_board_image')
             if avatar_file:
-                print("AVATAR FILE", avatar_file)
                 if avatar_file.size > 0:
                     user.blink_board_image.save(avatar_file.name, avatar_file, save=True)
                 else:
@@ -136,18 +135,20 @@ def findfriend(request):
     if request.method == 'GET':
         return render(request, 'findfriend.html')
 
+
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def blinkboard(request):
     if request.method == 'GET':
-        user = request.user
-        neighbours = User.objects.filter(location__icontains=user.location).exclude(username=user.username)
-
-        context = {
-            'neighbours': neighbours
-        }
-        print(neighbours)
-        return render(request, 'blinkboard.html', context=context)
+        # user = request.user
+        # print(user)
+        # neighbours = User.objects.filter(location__icontains=user.location).exclude(username=user.username)
+        #
+        # context = {
+        #     'neighbours': neighbours
+        # }
+        # print(neighbours)
+        return render(request, 'blinkboard.html')
 
 
 @api_view(['POST', 'GET'])
@@ -172,6 +173,7 @@ def filter_friend(request):
             user_list.append(user_data)
         return JsonResponse({'success': True, 'users': user_list})
 
+
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def send_friend_request(request):
@@ -179,15 +181,12 @@ def send_friend_request(request):
         requested_username = request.data.get('username')
         user_name = request.user
 
-        # Retrieve the User instance for the requested username
         user = User.objects.get(username=requested_username)
-        # Check if the friendship already exists
         if not Friend.objects.filter(user=user_name, friend=user).exists():
-            # Create a Friend instance with the correct User instances
             Friend.objects.create(user=user_name, friend=user)
 
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'already_friends'})
     else:
-            return JsonResponse(500)
+        return JsonResponse(500)

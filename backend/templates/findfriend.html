@@ -471,7 +471,7 @@
                 </div>
             </div>
             <nav class="nav">
-                <a href="#" class="home-logo">
+                <a href="{% url 'backend:update' %}" class="home-logo">
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
@@ -483,7 +483,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a class="nav__link" href="{% url 'backend:blinkboard' %}" id="blinkboard-link">
+                <a href="#" class="nav__link" id="blinkboard-link" onclick="loadBlinkboard()">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -631,25 +631,23 @@ function sendFriendRequest(user, imgClicked) {
     });
 }
 
-document.getElementById('blinkboard-link').addEventListener('click', function (event) {
-        // Prevent the default link behavior (prevent navigation)
-        event.preventDefault();
-
-        // Make a GET request to the blinkboard URL with the authentication token in the headers
-        fetch(this.href, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + getCookie("access_token")  // Include the authentication token in the headers
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response data as needed
-            console.log(data);
-        })
-        .catch(error => console.error('Error:', error));
-    });
+function loadBlinkboard() {
+    // Make a GET request to the blinkboard URL with the authentication token in the headers
+    fetch("{% url 'backend:blinkboard' %}", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getCookie("access_token")  // Include the authentication token in the headers
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the response data as needed
+        console.log(data);
+        // You might want to redirect or update the page content based on the response
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
 
 </html>

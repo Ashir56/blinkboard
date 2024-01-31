@@ -60,6 +60,8 @@
 
         .main {
             height: 100vh;
+            margin-left: 0px !important;
+            margin-right: 0px !important;
         }
 
         .img-flud {
@@ -203,7 +205,11 @@
 
             .col-sm-9 .container {
                 margin-top: 50px;
-                /* Add margin at the top for better spacing */
+
+            }
+
+            .right-aligned-container {
+                display: none;
             }
 
             .col-sm-9 h1 {
@@ -271,9 +277,11 @@
                 width: 100% !important;
                 margin-left: 0 !important;
             }
+
             .center-content {
                 display: none !important;
             }
+
             .center-container {
                 height: 3vh !important;
                 text-align: center;
@@ -431,11 +439,41 @@
             height: calc(100vh - 0px);
             /* Adjust the height considering the height of the navigation bar */
             margin-left: 25%;
-
+            /* Ensure content doesn't go under col-sm-3 */
         }
 
         .col-sm-9 .container {
-            margin-top: 50px;
+            margin-top: 250px;
+        }
+
+        /* CSS for the detail page */
+        #detailPage {
+            display: none;
+
+            padding: 20px;
+            /* Add padding for better visual separation */
+        }
+
+        #detailPage .container {
+            margin-bottom: 100px;
+
+        }
+
+        #detailPage h1 {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #detailPage img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        #backButton {
+            display: block;
+            margin: 20px auto;
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -471,7 +509,7 @@
                 </div>
             </div>
             <nav class="nav">
-                <a href="#" class="home-logo">
+                <a href="{% url 'backend:update' %}" class="home-logo">
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
@@ -489,91 +527,183 @@
                 </a>
             </nav>
         </div>
-        <div class="col-sm-9 " style="display: grid; align-items: center;">
+        <div class="col-sm-9 " style="display: grid; align-items: center;" id="originalGallery">
             <div class="gg">
                 <div class="container" style="margin-bottom: 100px;">
 
                     <h1 class="mt-5 mb-4 text-center" style="margin-top: 500px;">YOUR NEIGHBORHOOD</h1>
-                    <div class="row" style="border-bottom: 3px solid rgb(0, 0, 0);">
+                    <div class="row" id="row1" style="border-bottom: 3px solid rgb(0, 0, 0);">
                         <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 7"
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 7"
                                 style="width: 300px; height: 300px;">
                             <p>@username7</p>
-                            <button class="btn btn-primary">Accept Friend Request</button>
+                            <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
+                                Request</button>
                         </div>
                         <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 8"
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 7"
                                 style="width: 300px; height: 300px;">
-                            <p>@username8</p>
-                            <button class="btn btn-primary">Accept Friend Request</button>
+                            <p>@username7</p>
+                            <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
+                                Request</button>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" id="row2">
 
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
+                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv1">
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
                                 style="width: 300px; height: 300px;">
                             <p>@kevindonney12</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 2"
+                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv2">
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
                                 style="width: 300px; height: 300px;">
-                            <p>@username2</p>
+                            <p>@kevindonney12</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 3"
+                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv3">
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
                                 style="width: 300px; height: 300px;">
-                            <p>@username3</p>
+                            <p>@kevindonney12</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 4"
+                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv4">
+                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
                                 style="width: 300px; height: 300px;">
-                            <p>@username4</p>
+                            <p>@kevindonney12</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 5"
-                                style="width: 300px; height: 300px;">
-                            <p>@username5</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="/Users/apple/Desktop/Blinkboard (1)/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 6"
-                                style="width: 300px; height: 300px;">
-                            <p>@username6</p>
-                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
+        <div id="detailPage" style="display: none;">
+            <div class="col-sm-9 " style="display: grid; align-items: center;">
+                <div class="g">
+                    <div class="container mt-5" style="margin-top: 250px !important;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Back button positioned in the top left corner -->
+                            <div>
+                                <img src="assest/Graphics/BACKBUTTON.png" alt="Back Button" id="backButton"
+                                    style="max-width: 50px; max-height: 50px;">
+                            </div>
+                            <div class="text-center" style="width: 80%;">
+                                <h1 class="text-center mx-3">YOUR NEIGHBORHOOD</h1>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="bb-nav-wrapper  px-md-5 p-5">
+                                    <div class="bb-nav__inner">
+
+                                        <div class="bb-username--wrapper mb-4">
+                                            <h3 class="fz-18 fw-semibold text-center">@alexj</h3>
+                                        </div>
+                                        <div class="bb-user_profile--wrapper text-center">
+                                            <img src="https://thumbs.dreamstime.com/b/sunshine-tulips-zen-garden-hd-photo-features-vintage-fantasy-surreal-zen-gsrden-white-red-yellow-tulips-113557994.jpg"
+                                                alt="" class="mx-auto img-fluid bb_user--profile" />
+                                        </div>
+                                        <div
+                                            class="bb-update__blinkboard-btn text-center my-4 bb-home__header-left button__main fz-12">
+
+                                        </div>
+                                        <div class="bb-profie--info__wrapper">
+                                            <div class="bb-profile--info__item">
+                                                <div
+                                                    class="bb-profile--info__title fz-14 text-center fw-reg fst-italic mb-2">
+                                                    Location
+                                                </div>
+                                                <div class="bb-profile--info__desc fz-18 fw-semibold text-center mb-4">
+                                                    <span class="px-5 py-2 fz-18  rounded-regular">LOS
+                                                        ANGELES,
+                                                        CA</span>
+                                                </div>
+                                            </div>
+                                            <div class="bb-profile--info__item mb-4">
+                                                <div class="bb-profile--info__title fz-14 text-center fst-italic">
+                                                    Quote
+                                                </div>
+                                                <div class="bb-profile--info__desc fz-16 fw-medium text-center">
+                                                    Always Be A good is not be a good so be as you are.Always Be A good
+                                                    is not be a good
+                                                    so
+                                                    be as you are.
+                                                </div>
+                                            </div>
+                                            <div class="bb-profile--info__item mb-4">
+                                                <div class="bb-profile--info__title fz-14 text-center fst-italic">
+                                                    Bio
+                                                </div>
+                                                <div class="bb-profile--info__desc fz-16 fw-medium text-center">
+                                                    Always Be A good is not be a good so be as you are.Always Be A good
+                                                    is not be a good
+                                                    so
+                                                    be as you are.
+                                                    Always Be A good is not be a good so be as you are.Always Be A good
+                                                    is not be a good
+                                                    so
+                                                    be as you are.
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-primary" onclick="deleteUserImage()">Remove</button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="bb-content__inner">
+                                    <div class="bb-home--wrapper m-4 mx-auto">
+                                        <div class="right-aligned-container"
+                                            style="text-align: right;  padding: 10px; margin-bottom: 10px;">
+                                            <span>Posted on</span><span
+                                                id="updateDate">10-01-2024</span><span>@</span><span
+                                                id="updateTime">5:34pm</span>
+                                            <span>PST</span>
+                                        </div>
+
+                                        <!-- Another div containing a text area -->
+                                        <div class="text-area-container" style=" padding: 10px; margin-bottom: 10px;">
+                                            Hey Everyone, just wrapped a really cool shoot.
+                                            Amazing yoga studio space in Eagle Rock with a ton
+                                            of natural lighting. Hey Everyone, just wrapped a
+                                            really cool shoot. Amazing yoga studio space in Eagle
+                                            Rock with a ton of natural lighting. Hey Everyone,
+                                            just wrapped a really cool shoot. Amazing yoga studio
+                                            space in Eagle Rock with a ton of natural lighting. Amazing yoga studio
+                                            space
+                                            in Eagle Rock with a ton of natural lighting. Hey Everyone,
+                                            just wrapped a really cool shoot. Amazing yoga studio
+                                            space in Eagle Rock with a ton of natural lighting. Amazing yoga studio
+                                            space
+                                            in Eagle Rock with a ton of natural lighting. Hey Everyone,
+                                            just wrapped a really cool shoot. Amazing yoga studio
+                                            space in Eagle Rock with a ton of natural lighting.
+                                        </div>
+
+                                        <!-- Another div for the image with added class and margin bottom -->
+                                        <div class="centered-image-container neighimgbottom"onclick="displayZoomedImage()"
+                                            style="width: 200px; height: 200px; margin: 0 auto; overflow: hidden;">
+                                            <img src="assest/Graphics/NEIGHBORHOOD.png" id="zoomImage" alt="Your Image"
+                                                style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
 </body>
@@ -581,6 +711,112 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var image = document.getElementById("zoomImage");
+    image.addEventListener("click", function() {
+        // Create overlay element
+        var overlay = document.createElement("div");
+        overlay.style.position = "absolute";
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
 
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column"; // Adjust to column layout
+        overlay.style.alignItems = "center"; // Center items vertically
+
+        // Create image element inside overlay
+        var zoomedImage = document.createElement("img");
+        zoomedImage.src = image.src; // Use the same source as the clicked image
+        zoomedImage.style.maxWidth = "90%";
+        zoomedImage.style.maxHeight = "90%";
+        overlay.appendChild(zoomedImage);
+
+        // Add close button to overlay
+        var closeButton = document.createElement("img");
+        closeButton.src = "assest/Graphics/CLOSEBUTTON.png";
+        closeButton.style.top = "10px"; // Adjust top position as needed
+        closeButton.style.right = "10px"; // Adjust right position as needed
+        closeButton.style.width = "30px"; // Adjust width as needed
+        closeButton.style.height = "30px";
+        closeButton.style.cursor = "pointer";
+        closeButton.addEventListener("click", function() {
+            overlay.remove(); // Remove overlay when close button is clicked
+        });
+        overlay.appendChild(closeButton);
+
+        // For overlay to the container
+        var container = document.querySelector('.g .container');
+        container.style.position = 'relative'; // Ensure container has a position
+        container.appendChild(overlay);
+    });
+});
+
+ </script>
+<script>
+
+    $(document).ready(function () {
+        // Event handler for clicking on a user profile image
+        $('.col-sm-9').on('click', '.neighbor-img', function () {
+            var src = $(this).attr('src');
+            var alt = $(this).attr('alt');
+
+            // Set detail page content
+            $('#detailTitle').text(alt);
+            $('#detailImage').attr('src', src);
+
+            // Show detail page and hide original gallery
+            $('#originalGallery').hide();
+            $('#detailPage').show();
+        });
+
+        // Event handler for clicking the back button
+        $('#backButton').click(function () {
+            // Show original gallery and hide detail page
+            $('#detailPage').hide();
+            $('#originalGallery').show();
+        });
+    });
+</script>
+<script>
+    function acceptFriendRequest(button) {
+        // Get the parent div of the button (which is the column)
+        var column = button.parentNode;
+
+        // Clone the entire column
+        var clone = column.cloneNode(true);
+        clone.querySelector('button').remove();
+
+
+        document.getElementById('row2').appendChild(clone);
+
+
+        column.remove();
+    }
+</script>
+<script>
+function deleteUserImage() {
+    var userImageDiv = document.getElementById('userImageDiv');
+    var detailPage = document.getElementById('detailPage');
+
+    if (userImageDiv) {
+        userImageDiv.remove();
+    }
+
+    if (detailPage) {
+        detailPage.style.display = 'none'; // Hide the detailed page
+
+        // Show the gallery section again
+        var gallerySection = document.getElementById('originalGallery');
+        if (gallerySection) {
+            gallerySection.style.display = 'block';
+        }
+    }
+}
+
+</script>
 
 </html>

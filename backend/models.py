@@ -37,14 +37,13 @@ class User(AbstractBaseUser):
     avatar = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     blink_board = models.CharField(max_length=1000, null=True, blank=True)
     blink_board_image = models.ImageField(upload_to='blink_board_image', null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-
-from django.db import models
 
 class Friend(models.Model):
     PENDING = 'Pending'
