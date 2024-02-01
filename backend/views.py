@@ -3,27 +3,55 @@ import json
 import time
 
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
-from .models import User, Friend
+from .models import User, Friends
 
 import json
 from datetime import datetime
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
+
+
+def get_user_attribute(user, friend, attribute):
+    return getattr(friend.from_user if friend.from_user != user else friend.to_user, attribute)
+
+
+def get_all_friends(user):
+    # Retrieve friends where the user is the sender (from_user) and the request is accepted
+    sent_and_accepted = Friends.objects.filter(from_user=user, status='Accepted')
+    print(sent_and_accepted)
+
+    # Retrieve friends where the user is the receiver (to_user) and the request is accepted
+    received_and_accepted = Friends.objects.filter(to_user=user, status='Accepted')
+    print(received_and_accepted)
+    # Combine both sets of friends
+    all_friends = sent_and_accepted | received_and_accepted
+
+    return all_friends
+
+def get_friends(user):
+    # Retrieve friends where the user is the sender (from_user) and the request is accepted
+    sent_and_accepted = Friends.objects.filter(from_user=user)
+
+    # Retrieve friends where the user is the receiver (to_user) and the request is accepted
+    received_and_accepted = Friends.objects.filter(to_user=user)
+
+    # Combine both sets of friends
+    all_friends = sent_and_accepted | received_and_accepted
+
+    return all_friends
 
 
 @csrf_exempt
@@ -122,7 +150,7 @@ def update_user(request):
             blink_board = request.data.get('blink_board', None)
             if blink_board and len(blink_board) > 0:
                 user.blink_board = blink_board
-                user.updated_at = datetime.datetime.now()
+                user.updated_at = datetime.now()
 
             avatar_file = request.FILES.get('blink_board_image')
             if avatar_file:
@@ -139,32 +167,47 @@ def update_user(request):
 
 def get_neighbourhood_context(user):
     print(user.id)
-    pending_request = Friend.objects.filter(user=user, status='Pending')
-    accepted_request = Friend.objects.filter(user=user, status='Accepted')
-    print(pending_request)
-    neighbour_list = [{'username': neighbour.friend.username,
-                       'avatar': neighbour.friend.avatar.url if neighbour.friend.avatar else None,
-                       'blink_board': neighbour.friend.blink_board,
-                       'blink_board_image': neighbour.friend.blink_board_image.url if neighbour.friend.blink_board_image else None,
-                       'updated_at': neighbour.friend.updated_at, 'location': neighbour.friend.location if neighbour.friend.location else "",
-                       'bio': neighbour.friend.bio if neighbour.friend.bio else "",
-                       'quote': neighbour.friend.quote if neighbour.friend.quote else ""} for neighbour in
-                      accepted_request]
+    pending_request = Friends.objects.filter(to_user=user, status='Pending')
+    # accepted_request = get_all_friends(user)
+    sent_and_accepted = Friends.objects.filter(from_user=user, status='Accepted')
 
-    pending_list = [{'username': neighbour.friend.username,
-                     'avatar': neighbour.friend.avatar.url if neighbour.friend.avatar else None,
-                     'blink_board': neighbour.friend.blink_board,
-                     'blink_board_image': neighbour.friend.blink_board_image.url if neighbour.friend.blink_board_image else None,
-                     'updated_at': neighbour.friend.updated_at} for neighbour in
+    # Retrieve friends where the user is the receiver (to_user) and the request is accepted
+    received_and_accepted = Friends.objects.filter(to_user=user, status='Accepted')
+
+    neighbour_list = [{'username': neighbour.to_user.username,
+                       'avatar': neighbour.to_user.avatar.url if neighbour.to_user.avatar else None,
+                       'blink_board': neighbour.to_user.blink_board,
+                       'blink_board_image': neighbour.to_user.blink_board_image.url if neighbour.to_user.blink_board_image else None,
+                       'updated_at': neighbour.to_user.updated_at,
+                       'location': neighbour.to_user.location if neighbour.to_user.location else "",
+                       'bio': neighbour.to_user.bio if neighbour.to_user.bio else "",
+                       'quote': neighbour.to_user.quote if neighbour.to_user.quote else ""} for neighbour in
+                      sent_and_accepted]
+
+    neighbour_list.extend([{'username': neighbour.from_user.username,
+                       'avatar': neighbour.from_user.avatar.url if neighbour.from_user.avatar else None,
+                       'blink_board': neighbour.from_user.blink_board,
+                       'blink_board_image': neighbour.from_user.blink_board_image.url if neighbour.from_user.blink_board_image else None,
+                       'updated_at': neighbour.from_user.updated_at,
+                       'location': neighbour.from_user.location if neighbour.from_user.location else "",
+                       'bio': neighbour.from_user.bio if neighbour.from_user.bio else "",
+                       'quote': neighbour.from_user.quote if neighbour.from_user.quote else ""} for neighbour in
+                      received_and_accepted])
+
+    pending_list = [{'username': neighbour.from_user.username,
+                     'avatar': neighbour.from_user.avatar.url if neighbour.from_user.avatar else None,
+                     'blink_board': neighbour.from_user.blink_board,
+                     'blink_board_image': neighbour.from_user.blink_board_image.url if neighbour.from_user.blink_board_image else None,
+                     'updated_at': neighbour.from_user.updated_at} for neighbour in
                     pending_request]
 
     context = {
         'accepted_neighbourhoods': neighbour_list,
         'pending_neighbourhoods': pending_list,
-        'neighbours': json.dumps(neighbour_list,  cls=CustomJSONEncoder)
+        'neighbours': json.dumps(neighbour_list, cls=CustomJSONEncoder)
     }
-
     return context
+
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
@@ -181,8 +224,10 @@ def neighbourhood(request):
         access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
         user = request.user
         username = request.data.get('username', None)
+        print(user)
         if username:
-            neighbour = Friend.objects.filter(friend__username=username, user=user).first()
+            print(username)
+            neighbour = Friends.objects.filter(from_user__username=username, to_user=user).first()
             neighbour.status = 'Accepted'
             neighbour.save()
             context = get_neighbourhood_context(user)
@@ -199,24 +244,28 @@ def findfriend(request):
         return render(request, 'findfriend.html')
 
 
-from django.core.serializers import serialize
-
-
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def blinkboard(request):
     if request.method == 'GET':
-
         access_token = request.GET.get('access_token')
         decoded_token = AccessToken(access_token)
 
         user = User.objects.filter(id=decoded_token['user_id']).first()
 
-        neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
-        neighbour_list = [{'username': neighbour.username, 'avatar': neighbour.avatar.url if neighbour.avatar else None,
-                           'blink_board': neighbour.blink_board, 'blink_board_image': neighbour.blink_board_image.url if neighbour.blink_board_image else None,
-                           'updated_at': neighbour.updated_at} for neighbour in
-                          neighbours]
+        # neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
+        neighbours = get_all_friends(user)
+        print(neighbours)
+        neighbour_list = [{
+            'username': get_user_attribute(user, neighbour, 'username'),
+            'avatar': get_user_attribute(user, neighbour, 'avatar').url if get_user_attribute(user, neighbour,
+                                                                                              'avatar') else None,
+            'blink_board': get_user_attribute(user, neighbour, 'blink_board'),
+            'blink_board_image': get_user_attribute(user, neighbour, 'blink_board_image').url if get_user_attribute(
+                user, neighbour, 'blink_board_image') else None,
+            'updated_at': get_user_attribute(user, neighbour, 'updated_at')
+        } for neighbour in
+            neighbours]
         context = {
             'neighbours': neighbour_list
         }
@@ -229,21 +278,32 @@ def filter_friend(request):
     if request.method == 'GET':
         user_name = request.GET.get('username')
         print(user_name)
-        users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
-        print(users)
-        user_list = []
-
-        for user in users:
-            user_data = {'username': user.username}
-
-            # Check if the avatar field has a file associated with it
-            if user.avatar and user.avatar.file:
-                user_data['avatar'] = user.avatar.url
+        user = request.user
+        friends = get_friends(user)
+        usernames = []
+        users = None
+        for friend in friends:
+            if friend.from_user == user:
+                usernames.append(friend.to_user.username)
             else:
-                user_data['avatar'] = None  # Or any default value you prefer
+                usernames.append(friend.from_user.username)
+        if user_name:
+            users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
+        user_list = []
+        print(usernames)
+        if users:
+            for user in users:
+                if user.username not in usernames:
+                    user_data = {'username': user.username}
 
-            user_list.append(user_data)
-        return JsonResponse({'success': True, 'users': user_list})
+                    # Check if the avatar field has a file associated with it
+                    if user.avatar and user.avatar.file:
+                        user_data['avatar'] = user.avatar.url
+                    else:
+                        user_data['avatar'] = None  # Or any default value you prefer
+                    user_list.append(user_data)
+
+        return JsonResponse({'success': True, 'users': user_list, 'friends': usernames})
 
 
 @api_view(['POST', 'GET'])
@@ -254,8 +314,8 @@ def send_friend_request(request):
         user_name = request.user
 
         user = User.objects.get(username=requested_username)
-        if not Friend.objects.filter(user=user_name, friend=user).exists():
-            Friend.objects.create(user=user_name, friend=user)
+        if not Friends.objects.filter(from_user=user_name, to_user=user).exists():
+            Friends.objects.create(from_user=user_name, to_user=user)
 
             return JsonResponse({'status': 'success'})
         else:
@@ -274,8 +334,8 @@ def delete_friend(request):
         user_name = request.user
 
         user = User.objects.get(username=requested_username)
-        if Friend.objects.filter(user=user_name, friend=user).exists():
-            friendship = Friend.objects.filter(user=user_name, friend=user).first()
+        if Friends.objects.filter(from_user=user_name, to_user=user).exists():
+            friendship = Friends.objects.filter(from_user=user_name, to_user=user).first()
             friendship.delete()
 
             return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')

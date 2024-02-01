@@ -45,7 +45,23 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['email']
 
 
-class Friend(models.Model):
+#class Friend(models.Model):
+#     PENDING = 'Pending'
+#     ACCEPTED = 'Accepted'
+#     STATUS_CHOICES = [
+#         (PENDING, 'Pending'),
+#         (ACCEPTED, 'Accepted'),
+#     ]
+#
+#     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_user')
+#     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_friend')
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+#
+#     def __str__(self):
+#         return f"{self.user.username} - {self.friend.username}"
+
+
+class Friends(models.Model):
     PENDING = 'Pending'
     ACCEPTED = 'Accepted'
     STATUS_CHOICES = [
@@ -53,18 +69,16 @@ class Friend(models.Model):
         (ACCEPTED, 'Accepted'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_user')
-    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_as_friend')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friends_as_user')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friends_as_friend')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
 
     class Meta:
         # Define a unique constraint to create a composite primary key
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'friend'], name='unique_friendship'),
-        ]
+        unique_together= ['to_user', 'from_user']
 
     def __str__(self):
-        return f"{self.user.username} - {self.friend.username}"
+        return f"{self.from_user.username} - {self.to_user.username}"
 
 
 

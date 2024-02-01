@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>BlinkBoard</title>
     <style>
         body {
             overflow-x: hidden !important;
@@ -607,7 +607,7 @@
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
-                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
+                <a href="#" class="nav__link" id="neighbourhood_link">
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
@@ -615,7 +615,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="{% url 'backend:blinkboard' %}" class="nav__link">
+                <a href="#" class="nav__link" id="blinkboard-link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -673,6 +673,29 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    var accessToken = getCookie("access_token");
 
+    var blinkboardLink = document.getElementById("blinkboard-link");
+    var neighbourhoodlink = document.getElementById("neighbourhood_link");
+
+    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
+    neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
+
+    function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+</script>
 
 </html>

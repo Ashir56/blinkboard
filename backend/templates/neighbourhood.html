@@ -315,7 +315,7 @@
             }
 
             .col-sm-9 .container {
-                margin-top: 20% !important;
+                margin-top: 0% !important;
             }
 
             .center-container {
@@ -443,7 +443,7 @@
         }
 
         .col-sm-9 .container {
-            margin-top: 250px;
+            margin-top: 70px;
         }
 
         /* CSS for the detail page */
@@ -514,7 +514,7 @@
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
-                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
+                <a href="#" class="nav__link"  id="neighbourhood_link">
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt=""
                         style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
@@ -543,8 +543,13 @@
 
                                 <div class="row">
                                 <div class="col-lg-4 col-md-6 mb-4 text-center">
-                                    <img src="{{ neighbour.avatar }}" class="neighbor-img" alt="Image 7"
-                                        style="width: 200px; height: 200px;">
+                                    {% if neighbour.avatar %}
+                                        <img src="{{ neighbour.avatar }}" class="neighbor-img" alt="Image 7"
+                                            style="width: 200px; height: 200px;">
+                                    {% else %}
+                                        <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" class="neighbor-img" alt="Image 7"
+                                            style="width: 200px; height: 200px;">
+                                    {% endif %}
                                     <p>@{{neighbour.username}}</p>
                                     <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
                                         Request</button>
@@ -558,8 +563,13 @@
                         {% if accepted_neighbourhoods %}
                         {% for neighbour in accepted_neighbourhoods %}
                         <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv1">
-                            <img src="{{neighbour.avatar}}" class="neighbor-img" alt="Image 1"
+                            {% if neighbour.avatar %}
+                                <img src="{{neighbour.avatar}}" class="neighbor-img" alt="Image 1"
                                 style="width: 200px; height: 200px;">
+                            {% else %}
+                            <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Default Avatar" width="200" height="200">
+
+                            {% endif %}
                             <p>@{{neighbour.username}}</p>
                         </div>
                         {% endfor %}
@@ -689,6 +699,9 @@
 
     var accessToken = getCookie("access_token");
 
+    var neighbourhoodlink = document.getElementById("neighbourhood_link");
+    neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
+
     var blinkboardLink = document.getElementById("blinkboard-link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
 
@@ -779,9 +792,11 @@
                     var detailLocation = document.querySelector('#detailPage .rounded-regular');
                     var detailQuote = document.querySelector('#detailPage .fw-medium');
                     var detailBio = document.querySelector('#detailPage .fw-medium');
+                    var blink_board_image = document.getElementById('zoomImage');
 
                     detailTitle.textContent = '@' + clickedNeighbor.username;
                     detailImage.src = clickedNeighbor.avatar;
+                    blink_board_image.src = clickedNeighbor.blink_board_image;
                     detailUsername.textContent = clickedNeighbor.username;
                     detailLocation.textContent = clickedNeighbor.location;
                     detailQuote.textContent = clickedNeighbor.quote;
@@ -842,7 +857,7 @@
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("error")
         }
         return response.json();
     })
@@ -907,7 +922,7 @@
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("error")
         }
         return response.json();
     })

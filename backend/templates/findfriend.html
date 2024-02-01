@@ -565,8 +565,8 @@ function filterImages() {
             if (data.success) {
                 // Clear existing content
                 imageContainer.innerHTML = '';
-
                 // Iterate over users and update HTML content
+                console.log(data.users);
                 data.users.forEach(user => {
                     const userWrapper = document.createElement('div');
                     userWrapper.className = 'image-wrapper';
