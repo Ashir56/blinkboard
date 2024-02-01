@@ -352,7 +352,7 @@
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
-                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
+                <a href="#" class="nav__link" id="neighbourhood_link">
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
@@ -360,7 +360,7 @@
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
-                <a href="#" class="nav__link">
+                <a href="#" class="nav__link" id="blinkboard-link">
                     <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">BLINKBOARD</span>
                 </a>
@@ -426,13 +426,27 @@
 
 </body>
 <script>
+function deleteCookie(name) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
 
-    var accessToken = getCookie("access_token");
+    // Get the new access token from Django context
+    var accessToken = "{{ access_token }}";
+
+    // Delete the previous access_token cookie
+    deleteCookie("access_token");
+
+    document.cookie = "access_token=" + accessToken + "; path=/";
+
 
     var blinkboardLink = document.getElementById("blinkboard-link");
+    var neighbourhoodLink = document.getElementById("neighbourhood_link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
+    neighbourhoodLink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken;
 
-    document.cookie = "access_token={{ access_token }}; path=/";
+
+
+<!--    document.cookie = "access_token={{ access_token }}; path=/";-->
     var selectedFile; // Variable to store the selected file
 
 

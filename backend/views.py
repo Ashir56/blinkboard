@@ -1,10 +1,12 @@
 import datetime
+import json
 import time
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,6 +15,15 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from .models import User, Friend
+
+import json
+from datetime import datetime
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 @csrf_exempt
@@ -126,11 +137,59 @@ def update_user(request):
             return JsonResponse({'success': False, 'error': 'User not authenticated'}, status=401)
 
 
+def get_neighbourhood_context(user):
+    print(user.id)
+    pending_request = Friend.objects.filter(user=user, status='Pending')
+    accepted_request = Friend.objects.filter(user=user, status='Accepted')
+    print(pending_request)
+    neighbour_list = [{'username': neighbour.friend.username,
+                       'avatar': neighbour.friend.avatar.url if neighbour.friend.avatar else None,
+                       'blink_board': neighbour.friend.blink_board,
+                       'blink_board_image': neighbour.friend.blink_board_image.url if neighbour.friend.blink_board_image else None,
+                       'updated_at': neighbour.friend.updated_at, 'location': neighbour.friend.location if neighbour.friend.location else "",
+                       'bio': neighbour.friend.bio if neighbour.friend.bio else "",
+                       'quote': neighbour.friend.quote if neighbour.friend.quote else ""} for neighbour in
+                      accepted_request]
+
+    pending_list = [{'username': neighbour.friend.username,
+                     'avatar': neighbour.friend.avatar.url if neighbour.friend.avatar else None,
+                     'blink_board': neighbour.friend.blink_board,
+                     'blink_board_image': neighbour.friend.blink_board_image.url if neighbour.friend.blink_board_image else None,
+                     'updated_at': neighbour.friend.updated_at} for neighbour in
+                    pending_request]
+
+    context = {
+        'accepted_neighbourhoods': neighbour_list,
+        'pending_neighbourhoods': pending_list,
+        'neighbours': json.dumps(neighbour_list,  cls=CustomJSONEncoder)
+    }
+
+    return context
+
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def neighbourhood(request):
     if request.method == 'GET':
-        return render(request, 'neighbourhood.html')
+        access_token = request.GET.get('access_token')
+        decoded_token = AccessToken(access_token)
+
+        user = User.objects.filter(id=decoded_token['user_id']).first()
+        context = get_neighbourhood_context(user)
+        return render(request, 'neighbourhood.html', context)
+
+    if request.method == 'POST':
+        access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+        user = request.user
+        username = request.data.get('username', None)
+        if username:
+            neighbour = Friend.objects.filter(friend__username=username, user=user).first()
+            neighbour.status = 'Accepted'
+            neighbour.save()
+            context = get_neighbourhood_context(user)
+            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+        else:
+            context = get_neighbourhood_context(user)
+            return render(request, 'neighbourhood.html', context)
 
 
 @api_view(['POST', 'GET'])
@@ -147,6 +206,7 @@ from django.core.serializers import serialize
 @permission_classes([AllowAny])
 def blinkboard(request):
     if request.method == 'GET':
+
         access_token = request.GET.get('access_token')
         decoded_token = AccessToken(access_token)
 
@@ -198,6 +258,27 @@ def send_friend_request(request):
             Friend.objects.create(user=user_name, friend=user)
 
             return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'already_friends'})
+    else:
+        return JsonResponse(500)
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def delete_friend(request):
+    if request.method == 'POST':
+        access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+
+        requested_username = request.data.get('username')
+        user_name = request.user
+
+        user = User.objects.get(username=requested_username)
+        if Friend.objects.filter(user=user_name, friend=user).exists():
+            friendship = Friend.objects.filter(user=user_name, friend=user).first()
+            friendship.delete()
+
+            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
         else:
             return JsonResponse({'status': 'already_friends'})
     else:

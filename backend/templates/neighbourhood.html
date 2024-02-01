@@ -476,6 +476,7 @@
             margin: 20px auto;
         }
     </style>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -488,8 +489,8 @@
                 <div class="bb-nav__inner">
                     <div class="d-flex align-items-center " style="justify-content: center;">
                         <!-- Logo 1 -->
-                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid mb-3 mx-2"
-                                style="height: 100px;min-width: 100px; float: left;"></a>
+                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1"
+                                class="img-fluid mb-3 mx-2" style="height: 100px;min-width: 100px; float: left;"></a>
 
                         <!-- Logo 2 -->
                         <img src="{% static 'backend/Graphics/BLINKBOARDLOGO.png' %}" alt="Logo 2" class="iuid "
@@ -514,7 +515,8 @@
                     <span class="nav__text">HOME</span>
                 </a>
                 <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
-                    <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
+                    <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt=""
+                        style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
                 <a href="{% url 'backend:findfriend' %}" class="nav__link ">
@@ -529,48 +531,39 @@
         </div>
         <div class="col-sm-9 " style="display: grid; align-items: center;" id="originalGallery">
             <div class="gg">
-                <div class="container" style="margin-bottom: 100px;">
+                <div class="container">
 
                     <h1 class="mt-5 mb-4 text-center" style="margin-top: 500px;">YOUR NEIGHBORHOOD</h1>
-                    <div class="row" id="row1" style="border-bottom: 3px solid rgb(0, 0, 0);">
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 7"
-                                style="width: 300px; height: 300px;">
-                            <p>@username7</p>
-                            <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
-                                Request</button>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 7"
-                                style="width: 300px; height: 300px;">
-                            <p>@username7</p>
-                            <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
-                                Request</button>
+                    <div class="row" id="row1">
+                        {% if pending_neighbourhoods %}
+                        <div class="col-sm-12" id="Friendrequest"
+                                    style=" border-bottom: 1px solid black; max-width: 80%; margin: 0 auto ; ">
+                                    <h1 class=" mb-4 text-center">NEW REQUEST</h1>
+                            {% for neighbour in pending_neighbourhoods %}
+
+                                <div class="row">
+                                <div class="col-lg-4 col-md-6 mb-4 text-center">
+                                    <img src="{{ neighbour.avatar }}" class="neighbor-img" alt="Image 7"
+                                        style="width: 200px; height: 200px;">
+                                    <p>@{{neighbour.username}}</p>
+                                    <button onclick="acceptFriendRequest(this)" class="btn btn-primary">Accept Friend
+                                        Request</button>
+                                </div>
+                                </div>
+                                    {% endfor %}
+                                    {% endif %}
                         </div>
                     </div>
                     <div class="row" id="row2">
-
+                        {% if accepted_neighbourhoods %}
+                        {% for neighbour in accepted_neighbourhoods %}
                         <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv1">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
-                                style="width: 300px; height: 300px;">
-                            <p>@kevindonney12</p>
+                            <img src="{{neighbour.avatar}}" class="neighbor-img" alt="Image 1"
+                                style="width: 200px; height: 200px;">
+                            <p>@{{neighbour.username}}</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv2">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
-                                style="width: 300px; height: 300px;">
-                            <p>@kevindonney12</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv3">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
-                                style="width: 300px; height: 300px;">
-                            <p>@kevindonney12</p>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv4">
-                            <img src="assest/Graphics/NEIGHBORHOOD.png" class="neighbor-img" alt="Image 1"
-                                style="width: 300px; height: 300px;">
-                            <p>@kevindonney12</p>
-                        </div>
-
+                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -582,7 +575,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <!-- Back button positioned in the top left corner -->
                             <div>
-                                <img src="assest/Graphics/BACKBUTTON.png" alt="Back Button" id="backButton"
+                                <img src="{% static 'backend/Graphics/BACKBUTTON.png' %}" alt="Back Button" id="backButton"
                                     style="max-width: 50px; max-height: 50px;">
                             </div>
                             <div class="text-center" style="width: 80%;">
@@ -596,14 +589,15 @@
                                     <div class="bb-nav__inner">
 
                                         <div class="bb-username--wrapper mb-4">
-                                            <h3 class="fz-18 fw-semibold text-center">@alexj</h3>
+                                            <h3 class="fz-18 fw-semibold text-center" id="zoomed_in_username">@alexj</h3>
                                         </div>
                                         <div class="bb-user_profile--wrapper text-center">
                                             <img src="https://thumbs.dreamstime.com/b/sunshine-tulips-zen-garden-hd-photo-features-vintage-fantasy-surreal-zen-gsrden-white-red-yellow-tulips-113557994.jpg"
+                                                 id="user_image"
                                                 alt="" class="mx-auto img-fluid bb_user--profile" />
                                         </div>
                                         <div
-                                            class="bb-update__blinkboard-btn text-center my-4 bb-home__header-left button__main fz-12">
+                                            class="bb-update_blinkboard-btn text-center my-4 bb-homeheader-left button_main fz-12">
 
                                         </div>
                                         <div class="bb-profie--info__wrapper">
@@ -623,10 +617,7 @@
                                                     Quote
                                                 </div>
                                                 <div class="bb-profile--info__desc fz-16 fw-medium text-center">
-                                                    Always Be A good is not be a good so be as you are.Always Be A good
-                                                    is not be a good
-                                                    so
-                                                    be as you are.
+
                                                 </div>
                                             </div>
                                             <div class="bb-profile--info__item mb-4">
@@ -634,14 +625,7 @@
                                                     Bio
                                                 </div>
                                                 <div class="bb-profile--info__desc fz-16 fw-medium text-center">
-                                                    Always Be A good is not be a good so be as you are.Always Be A good
-                                                    is not be a good
-                                                    so
-                                                    be as you are.
-                                                    Always Be A good is not be a good so be as you are.Always Be A good
-                                                    is not be a good
-                                                    so
-                                                    be as you are.
+
                                                 </div>
                                             </div>
 
@@ -667,25 +651,11 @@
 
                                         <!-- Another div containing a text area -->
                                         <div class="text-area-container" style=" padding: 10px; margin-bottom: 10px;">
-                                            Hey Everyone, just wrapped a really cool shoot.
-                                            Amazing yoga studio space in Eagle Rock with a ton
-                                            of natural lighting. Hey Everyone, just wrapped a
-                                            really cool shoot. Amazing yoga studio space in Eagle
-                                            Rock with a ton of natural lighting. Hey Everyone,
-                                            just wrapped a really cool shoot. Amazing yoga studio
-                                            space in Eagle Rock with a ton of natural lighting. Amazing yoga studio
-                                            space
-                                            in Eagle Rock with a ton of natural lighting. Hey Everyone,
-                                            just wrapped a really cool shoot. Amazing yoga studio
-                                            space in Eagle Rock with a ton of natural lighting. Amazing yoga studio
-                                            space
-                                            in Eagle Rock with a ton of natural lighting. Hey Everyone,
-                                            just wrapped a really cool shoot. Amazing yoga studio
-                                            space in Eagle Rock with a ton of natural lighting.
                                         </div>
 
                                         <!-- Another div for the image with added class and margin bottom -->
-                                        <div class="centered-image-container neighimgbottom"onclick="displayZoomedImage()"
+                                        <div class="centered-image-container neighimgbottom"
+                                            onclick="displayZoomedImage()"
                                             style="width: 200px; height: 200px; margin: 0 auto; overflow: hidden;">
                                             <img src="assest/Graphics/NEIGHBORHOOD.png" id="zoomImage" alt="Your Image"
                                                 style="width: 100%; height: 100%; object-fit: cover;">
@@ -712,100 +682,182 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
+    var neighbourhoods = {{ neighbours|safe }};
+</script>
+
+<script>
 
     var accessToken = getCookie("access_token");
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
 
-       function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-    }
 
-document.addEventListener("DOMContentLoaded", function() {
-    var image = document.getElementById("zoomImage");
-    image.addEventListener("click", function() {
-        // Create overlay element
-        var overlay = document.createElement("div");
-        overlay.style.position = "absolute";
-        overlay.style.top = 0;
-        overlay.style.left = 0;
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+    document.addEventListener("DOMContentLoaded", function () {
+        var image = document.getElementById("zoomImage");
+        image.addEventListener("click", function () {
+            // Create overlay element
+            var overlay = document.createElement("div");
+            overlay.style.position = "absolute";
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
 
-        overlay.style.display = "flex";
-        overlay.style.flexDirection = "column"; // Adjust to column layout
-        overlay.style.alignItems = "center"; // Center items vertically
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column"; // Adjust to column layout
+            overlay.style.alignItems = "center"; // Center items vertically
 
-        // Create image element inside overlay
-        var zoomedImage = document.createElement("img");
-        zoomedImage.src = image.src; // Use the same source as the clicked image
-        zoomedImage.style.maxWidth = "90%";
-        zoomedImage.style.maxHeight = "90%";
-        overlay.appendChild(zoomedImage);
+            // Create image element inside overlay
+            var zoomedImage = document.createElement("img");
+            zoomedImage.src = image.src; // Use the same source as the clicked image
+            zoomedImage.style.maxWidth = "90%";
+            zoomedImage.style.maxHeight = "90%";
+            overlay.appendChild(zoomedImage);
 
-        // Add close button to overlay
-        var closeButton = document.createElement("img");
-        closeButton.src = "assest/Graphics/CLOSEBUTTON.png";
-        closeButton.style.top = "10px"; // Adjust top position as needed
-        closeButton.style.right = "10px"; // Adjust right position as needed
-        closeButton.style.width = "30px"; // Adjust width as needed
-        closeButton.style.height = "30px";
-        closeButton.style.cursor = "pointer";
-        closeButton.addEventListener("click", function() {
-            overlay.remove(); // Remove overlay when close button is clicked
+            // Add close button to overlay
+            var closeButton = document.createElement("img");
+            closeButton.src = "assest/Graphics/CLOSEBUTTON.png";
+            closeButton.style.top = "10px"; // Adjust top position as needed
+            closeButton.style.right = "10px"; // Adjust right position as needed
+            closeButton.style.width = "30px"; // Adjust width as needed
+            closeButton.style.height = "30px";
+            closeButton.style.cursor = "pointer";
+            closeButton.addEventListener("click", function () {
+                overlay.remove(); // Remove overlay when close button is clicked
+            });
+            overlay.appendChild(closeButton);
+
+            // For overlay to the container
+            var container = document.querySelector('.g .container');
+            container.style.position = 'relative'; // Ensure container has a position
+            container.appendChild(overlay);
         });
-        overlay.appendChild(closeButton);
+    });
 
-        // For overlay to the container
-        var container = document.querySelector('.g .container');
-        container.style.position = 'relative'; // Ensure container has a position
-        container.appendChild(overlay);
+    document.addEventListener("DOMContentLoaded", function () {
+    var accepted_neighbourhoods = neighbourhoods;
+    // Event handler for clicking on a user profile image
+    document.querySelector('.col-sm-9').addEventListener('click', function (event) {
+        if (event.target.classList.contains('neighbor-img')) {
+            var parentDiv = event.target.parentNode;
+
+            // Find the adjacent <p> tag within the parent div
+            var usernameElement = parentDiv.querySelector('p');
+
+            // Get the username text
+            var username = usernameElement.textContent.trim().substring(1);
+
+            // Find the clicked neighbor in the accepted_neighbourhoods list
+            var clickedNeighbor = Object.values(accepted_neighbourhoods).find(function (neighbor) {
+                return neighbor.username === username;
+            });
+
+            console.log(clickedNeighbor.username)
+            if (clickedNeighbor) {
+                // Set detail page content
+                var detailTitle = document.querySelector('#detailPage h3');
+                    var detailImage = document.getElementById('user_image');
+                    var updateDate = document.getElementById('updateDate');
+                    var updateTime = document.getElementById('updateTime');
+                    var detailUsername = document.querySelector('#detailPage .fz-18');
+                    var detailLocation = document.querySelector('#detailPage .rounded-regular');
+                    var detailQuote = document.querySelector('#detailPage .fw-medium');
+                    var detailBio = document.querySelector('#detailPage .fw-medium');
+
+                    detailTitle.textContent = '@' + clickedNeighbor.username;
+                    detailImage.src = clickedNeighbor.avatar;
+                    detailUsername.textContent = clickedNeighbor.username;
+                    detailLocation.textContent = clickedNeighbor.location;
+                    detailQuote.textContent = clickedNeighbor.quote;
+                    updateDate.textContent = '{{ clickedNeighbor.updated_at|date:"F d, Y" }}',
+                    updateTime.textContent = '{{ clickedNeighbor.updated_at|time:"h:i A" }}',
+                    detailBio.textContent = clickedNeighbor.bio;
+                // Show detail page and hide original gallery
+                document.getElementById('originalGallery').style.display = 'none';
+                document.getElementById('detailPage').style.display = 'block';
+
+            }
+        }
+    });
+
+    // Event handler for clicking the back button
+    document.getElementById('backButton').addEventListener('click', function () {
+        // Show original gallery and hide detail page
+        document.getElementById('detailPage').style.display = 'none';
+        document.getElementById('originalGallery').style.display = 'block';
     });
 });
 
-    $(document).ready(function () {
-        // Event handler for clicking on a user profile image
-        $('.col-sm-9').on('click', '.neighbor-img', function () {
-            var src = $(this).attr('src');
-            var alt = $(this).attr('alt');
-
-            // Set detail page content
-            $('#detailTitle').text(alt);
-            $('#detailImage').attr('src', src);
-
-            // Show detail page and hide original gallery
-            $('#originalGallery').hide();
-            $('#detailPage').show();
-        });
-
-        // Event handler for clicking the back button
-        $('#backButton').click(function () {
-            // Show original gallery and hide detail page
-            $('#detailPage').hide();
-            $('#originalGallery').show();
-        });
-    });
 
     function acceptFriendRequest(button) {
         // Get the parent div of the button (which is the column)
         var column = button.parentNode;
-
+        console.log("button clicked");
+        console.log(column)
         // Clone the entire column
         var clone = column.cloneNode(true);
+
+    // Remove the button from the cloned column
         clone.querySelector('button').remove();
+
+    // Get the <p> tag from the cloned column
+    var pTag = clone.querySelector('p');
+
+    // Now you can access and manipulate the <p> tag as needed
+    var username = pTag.textContent;
+    var user = username.substring(1);
+    console.log(user)
+
+    var updateUrl = "{% url 'backend:neighbourhood' %}";
+
+    // Use the fetch function to make the AJAX request
+
+    fetch(updateUrl, {
+        method: 'POST',
+
+        headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie("csrftoken"),
+        'Authorization': 'Bearer ' + getCookie("access_token"),
+        },
+        body: JSON.stringify({
+        'username': user
+    }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            console.log(response.success);
+        } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
 
 
         document.getElementById('row2').appendChild(clone);
@@ -814,24 +866,64 @@ document.addEventListener("DOMContentLoaded", function() {
         column.remove();
     }
 
-function deleteUserImage() {
-    var userImageDiv = document.getElementById('userImageDiv');
-    var detailPage = document.getElementById('detailPage');
+    function deleteUserImage() {
+        var userImageDiv = document.getElementById('userImageDiv');
+        var usernameElement = document.getElementById('zoomed_in_username');
+        var user = usernameElement.textContent;
+        console.log(user)
+<!--        console.log("User" + user);-->
+<!--        if (userImageDiv) {-->
+<!--            userImageDiv.remove();-->
+<!--        }-->
 
-    if (userImageDiv) {
-        userImageDiv.remove();
-    }
+<!--        if (detailPage) {-->
+<!--            detailPage.style.display = 'none'; // Hide the detailed page-->
 
-    if (detailPage) {
-        detailPage.style.display = 'none'; // Hide the detailed page
+<!--            // Show the gallery section again-->
+<!--            var gallerySection = document.getElementById('originalGallery');-->
+<!--            if (gallerySection) {-->
+<!--                gallerySection.style.display = 'block';-->
+<!--            }-->
+<!--        }-->
 
-        // Show the gallery section again
-        var gallerySection = document.getElementById('originalGallery');
-        if (gallerySection) {
-            gallerySection.style.display = 'block';
+
+
+
+    var updateUrl = "{% url 'backend:delete_friend' %}";
+
+    // Use the fetch function to make the AJAX request
+
+    fetch(updateUrl, {
+        method: 'POST',
+
+        headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie("csrftoken"),
+        'Authorization': 'Bearer ' + getCookie("access_token"),
+        },
+        body: JSON.stringify({
+        'username': user
+    }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        return response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            console.log(response.success);
+        } else {
+            console.error('Profile update failed:', response.error);
+            // Optionally display an error message or perform additional actions
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+    });
     }
-}
 
 </script>
 

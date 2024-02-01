@@ -475,7 +475,7 @@
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
-                <a href="{% url 'backend:neighbourhood' %}" class="nav__link">
+                <a href="#" class="nav__link" id="neighbourhood_link">
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
@@ -517,7 +517,10 @@
     var accessToken = getCookie("access_token");
 
     var blinkboardLink = document.getElementById("blinkboard-link");
+    var neighbourhoodlink = document.getElementById("neighbourhood_link");
+
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
+    neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
 
         function getCookie(name) {
             var cookieValue = null;
