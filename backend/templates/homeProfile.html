@@ -308,7 +308,7 @@
                             {% endif %}
                             <div class="overlay" id="imageOverlay">
                                 <div class="replace-icon" onclick="triggerFileInput()">
-                                    <img style="height: 250px; width: 250px;" src="/Users/apple/Desktop/Blinkboard (1)/Graphics/ADDPROFILEPIC.png"
+                                    <img style="height: 250px; width: 250px;" src="{% static 'backend/Graphics/ADDPROFILEPIC.png' %}"
                                         alt="">
                                 </div>
                             </div>
@@ -348,7 +348,7 @@
                 </div>
             </div>
             <nav class="nav">
-                <a href="#" class="home-logo">
+                <a href="#" class="home-logo" id="home_link">
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
@@ -440,9 +440,11 @@ function deleteCookie(name) {
 
 
     var blinkboardLink = document.getElementById("blinkboard-link");
+    var homeLink = document.getElementById("home_link");
     var neighbourhoodLink = document.getElementById("neighbourhood_link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     neighbourhoodLink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken;
+    homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
 
 
 

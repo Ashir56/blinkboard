@@ -471,7 +471,7 @@
                 </div>
             </div>
             <nav class="nav">
-                <a href="{% url 'backend:update' %}" class="home-logo">
+                <a href="#" class="home-logo" id="home_link">
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
                 </a>
@@ -518,9 +518,13 @@
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     var neighbourhoodlink = document.getElementById("neighbourhood_link");
+    var homeLink = document.getElementById("home_link");
+
 
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
+    homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+
 
         function getCookie(name) {
             var cookieValue = null;

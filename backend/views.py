@@ -88,7 +88,6 @@ def login_view(request):
 
                 },
                 'access_token': access_token,
-                'refresh_token': refresh_token,
             }
 
             # return Response(context)
@@ -339,7 +338,49 @@ def delete_friend(request):
             friendship.delete()
 
             return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+        elif Friends.objects.filter(to_user=user_name, from_user=user).exists():
+            friendship = Friends.objects.filter(to_user=user_name, from_user=user).first()
+            friendship.delete()
+            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+
         else:
             return JsonResponse({'status': 'already_friends'})
     else:
         return JsonResponse(500)
+
+@api_view(['POST', 'GET'])
+@permission_classes([AllowAny])
+def homeProfile(request):
+    if request.method == 'GET':
+        access_token = request.GET.get('access_token')
+        if access_token:
+            decoded_token = AccessToken(access_token)
+
+            user = User.objects.filter(id=decoded_token['user_id']).first()
+        else:
+            user = request.user
+
+        if user:
+            context = {
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'location': user.location,
+                    'bio': user.bio,
+                    'quote': user.quote,
+                    'avatar': user.avatar if user.avatar else None,
+                    'blink_board': user.blink_board,
+                    'blink_board_image': user.blink_board_image,
+                    'updated_at': user.updated_at
+
+                },
+                'access_token': access_token,
+            }
+
+            # return Response(context)
+
+            # Render the desired template, for example 'homeProfile.html'
+            return render(request, 'homeProfile.html', context)
+        else:
+            return JsonResponse("No User Found")
