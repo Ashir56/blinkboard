@@ -343,7 +343,7 @@
 
             justify-content: center;
             align-items: center;
-            margin-top: 200px;
+            margin-top: 90px;
         }
 
         .center-content {
@@ -545,8 +545,7 @@
 
             // Loop through the neighbours and append HTML
             neighbours.forEach(neighbour => {
-                const neighbourHtml = '
-                    <div class="row parent">
+                const neighbourHtml = `<div class="row parent">
                             <div class="col-md-4">
                                 <div class="user-info">
                                     <div id="username">@{{ neighbour.username}}</div>
@@ -570,7 +569,7 @@
                                     </div>
                                 </div>
                             </div>
-                ;
+                `;
                 neighbourContainer.innerHTML += neighbourHtml;
             });
         }
@@ -585,7 +584,7 @@
                 <div class="bb-nav__inner">
                     <div class="d-flex align-items-center " style="justify-content: center;">
                         <!-- Logo 1 -->
-                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid mb-3 mx-2"
+                        <a href="#" id="home_link1"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid mb-3 mx-2"
                                 style="height: 100px;min-width: 100px; float: left;"></a>
 
                         <!-- Logo 2 -->
@@ -595,7 +594,7 @@
                     <div class="center-container ">
                         <div class="center-content">
                             <img src="{% static 'backend/Graphics/BLINKBOARDS.png' %}" alt="Centered Image"
-                                style="height: 250px; width: 250px ;"> <br>
+                                style="height: 200px; width: 200px ;"> <br>
                         </div>
 
                         <span style="font-weight: 600; font-size: 30px; font-style: italic;">BLINKBOARD</span>
@@ -679,11 +678,13 @@
     var blinkboardLink = document.getElementById("blinkboard-link");
     var neighbourhoodlink = document.getElementById("neighbourhood_link");
     var homeLink = document.getElementById("home_link");
+    var homeLink1 = document.getElementById("home_link1");
 
 
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
     homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+    homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
 
 
     function getCookie(name) {

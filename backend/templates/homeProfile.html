@@ -288,7 +288,7 @@
                 <div class="bb-nav__inner">
                     <div class="d-flex align-items-center " style="justify-content: center;">
                         <!-- Logo 1 -->
-                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid mb-3 mx-2"
+                        <a href="#" id="home_link1"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" class="img-fluid "
                                 style="height: 100px;min-width: 100px; float: left;"></a>
 
                         <!-- Logo 2 -->
@@ -315,7 +315,7 @@
                             <div class="change-image-button" onclick="changeImage()"></div>
                         </div>
 
-                        <div class="bb-update__linkboard-btn text-center my-4 bb-home__header-left button__main fz-12">
+                        <div class="bb-update__linkboard-btn text-center my-2 bb-home__header-left button__main fz-12">
                             <button class="btn btn-primary fz-12 width-120" id="editButton" onclick="toggleEdit()">EDIT PROFILE</button>
                         </div>
 
@@ -331,13 +331,13 @@
                             <label for="quote"
                                 class="bb-profile--info__title fz-14 text-center fst-italic">Quote</label>
                             <div class="form-group">
-                                <textarea class="form-control fz-16 fw-medium text-center" id="quote" rows="4"
+                                <textarea class="form-control fz-16 fw-medium text-center" id="quote" rows="2"
                                     disabled>{{ user.quote}}</textarea>
                             </div>
 
-                            <label for="bio" class="bb-profile--info__title fz-14 text-center fst-italic">Bio</label>
+                            <label for="bio" class="bb-profile--info__title fz-14 text-center fst-italic" >Bio</label>
                             <div class="form-group">
-                                <textarea class="form-control fz-16 fw-medium text-center" id="bio" rows="6"
+                                <textarea class="form-control fz-16 fw-medium text-center" id="bio" rows="4" style="margin-bottom:70px;"
                                     disabled>{{ user.bio }}</textarea>
                             </div>
                         </div>
@@ -347,7 +347,7 @@
 
                 </div>
             </div>
-            <nav class="nav">
+            <nav class="nav" style="margin-left:12px;">
                 <a href="#" class="home-logo" id="home_link">
                     <img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1" style="height: 50px; width: 50px;">
                     <span class="nav__text">HOME</span>
@@ -374,7 +374,7 @@
                         <div class="bb-home--header  justify-content-md-between align-items-center mb-4" style="display: flex;">
                             <button class="btn btn-primary bb-update__blinkboard-btn bb-home__header-left button__main btn btn-primary fz-12 width-150" onclick="toggleContentEditable()">UPDATE BLINKBOARD</button>
                             <div class="bb-home__header-right date__blinkboard fz-16 fw-semibold">
-                                <span>Posted on</span><span id="updateDate">{{ user.updated_at|date:"F d, Y" }}</span><span>@</span><span
+                                <span>Posted on</span><span id="updateDate">{{ user.updated_at|date:"F d, Y" }}</span><span> @ </span><span
                                     id="updateTime">{{user.updated_at|time:"h:i A" }}</span>
                                 <span>PST</span>
                             </div>
@@ -441,10 +441,12 @@ function deleteCookie(name) {
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     var homeLink = document.getElementById("home_link");
+    var homeLink1 = document.getElementById("home_link1");
     var neighbourhoodLink = document.getElementById("neighbourhood_link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     neighbourhoodLink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken;
     homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+    homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
 
 
 

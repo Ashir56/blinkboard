@@ -1,6 +1,7 @@
 import datetime
 import json
 import time
+import uuid
 
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
@@ -41,6 +42,7 @@ def get_all_friends(user):
 
     return all_friends
 
+
 def get_friends(user):
     # Retrieve friends where the user is the sender (from_user) and the request is accepted
     sent_and_accepted = Friends.objects.filter(from_user=user)
@@ -64,7 +66,6 @@ def login_view(request):
     elif request.method == 'POST':
         username = request.data.get('username')
         password = request.data.get('password')
-
         user = authenticate(username=username, password=password)
 
         if user:
@@ -91,11 +92,16 @@ def login_view(request):
             }
 
             # return Response(context)
+            # session_id = str(user.id)
 
             # Render the desired template, for example 'homeProfile.html'
-            return render(request, 'homeProfile.html', context)
+            response = render(request, 'homeProfile.html', context)
+            # response.set_cookie('access_token', access_token)
+            # response.set_cookie(f'access_token_{session_id}', access_token)
+
+            return response
         else:
-            return HttpResponseBadRequest('Login Failed')
+            return render(request, 'loginFailed.html')
 
 
 @api_view(['POST', 'GET'])
@@ -184,14 +190,14 @@ def get_neighbourhood_context(user):
                       sent_and_accepted]
 
     neighbour_list.extend([{'username': neighbour.from_user.username,
-                       'avatar': neighbour.from_user.avatar.url if neighbour.from_user.avatar else None,
-                       'blink_board': neighbour.from_user.blink_board,
-                       'blink_board_image': neighbour.from_user.blink_board_image.url if neighbour.from_user.blink_board_image else None,
-                       'updated_at': neighbour.from_user.updated_at,
-                       'location': neighbour.from_user.location if neighbour.from_user.location else "",
-                       'bio': neighbour.from_user.bio if neighbour.from_user.bio else "",
-                       'quote': neighbour.from_user.quote if neighbour.from_user.quote else ""} for neighbour in
-                      received_and_accepted])
+                            'avatar': neighbour.from_user.avatar.url if neighbour.from_user.avatar else None,
+                            'blink_board': neighbour.from_user.blink_board,
+                            'blink_board_image': neighbour.from_user.blink_board_image.url if neighbour.from_user.blink_board_image else None,
+                            'updated_at': neighbour.from_user.updated_at,
+                            'location': neighbour.from_user.location if neighbour.from_user.location else "",
+                            'bio': neighbour.from_user.bio if neighbour.from_user.bio else "",
+                            'quote': neighbour.from_user.quote if neighbour.from_user.quote else ""} for neighbour in
+                           received_and_accepted])
 
     pending_list = [{'username': neighbour.from_user.username,
                      'avatar': neighbour.from_user.avatar.url if neighbour.from_user.avatar else None,
@@ -217,6 +223,8 @@ def neighbourhood(request):
 
         user = User.objects.filter(id=decoded_token['user_id']).first()
         context = get_neighbourhood_context(user)
+        print(user)
+        print(context)
         return render(request, 'neighbourhood.html', context)
 
     if request.method == 'POST':
@@ -336,17 +344,19 @@ def delete_friend(request):
         if Friends.objects.filter(from_user=user_name, to_user=user).exists():
             friendship = Friends.objects.filter(from_user=user_name, to_user=user).first()
             friendship.delete()
-
+            print("1st")
             return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
         elif Friends.objects.filter(to_user=user_name, from_user=user).exists():
             friendship = Friends.objects.filter(to_user=user_name, from_user=user).first()
             friendship.delete()
+            print("2nd")
             return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
 
         else:
             return JsonResponse({'status': 'already_friends'})
     else:
         return JsonResponse(500)
+
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])

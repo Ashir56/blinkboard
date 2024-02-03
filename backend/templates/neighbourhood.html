@@ -204,7 +204,8 @@
             }
 
             .col-sm-9 .container {
-                margin-top: 50px;
+                margin-top: 150px;
+
 
             }
 
@@ -345,7 +346,7 @@
 
             justify-content: center;
             align-items: center;
-            margin-top: 200px;
+            margin-top: 90px;
         }
 
         .center-content {
@@ -442,15 +443,14 @@
             /* Ensure content doesn't go under col-sm-3 */
         }
 
-        .col-sm-9 .container {
-            margin-top: 70px;
-        }
+
 
         /* CSS for the detail page */
         #detailPage {
             display: none;
 
-            padding: 20px;
+            padding-left:0px !Important;
+            padding-right: 0px !Important;
             /* Add padding for better visual separation */
         }
 
@@ -489,7 +489,7 @@
                 <div class="bb-nav__inner">
                     <div class="d-flex align-items-center " style="justify-content: center;">
                         <!-- Logo 1 -->
-                        <a href="#"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1"
+                        <a href="#" id="home_link1"><img src="{% static 'backend/Graphics/HOME.png' %}" alt="Logo 1"
                                 class="img-fluid mb-3 mx-2" style="height: 100px;min-width: 100px; float: left;"></a>
 
                         <!-- Logo 2 -->
@@ -499,7 +499,7 @@
                     <div class="center-container ">
                         <div class="center-content">
                             <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="Centered Image"
-                                style="height: 250px; width: 250px ;"> <br>
+                                style="height: 200px; width: 200px ;"> <br>
                         </div>
 
                         <span style="font-weight: 600; font-size: 30px; font-style: italic;">NEIGHBORHOOD</span>
@@ -529,7 +529,7 @@
                 </a>
             </nav>
         </div>
-        <div class="col-sm-9 " style="display: grid; align-items: center;" id="originalGallery">
+        <div class="col-sm-9 " style="display: grid; " id="originalGallery">
             <div class="gg">
                 <div class="container">
 
@@ -559,7 +559,7 @@
                                     {% endif %}
                         </div>
                     </div>
-                    <div class="row" id="row2">
+                    <div class="row" id="row2" style="margin-bottom:50px; margin-top:25px;">
                         {% if accepted_neighbourhoods %}
                         {% for neighbour in accepted_neighbourhoods %}
                         <div class="col-lg-4 col-md-6 mb-4 text-center" id="userImageDiv1">
@@ -567,7 +567,7 @@
                                 <img src="{{neighbour.avatar}}" class="neighbor-img" alt="Image 1"
                                 style="width: 200px; height: 200px;">
                             {% else %}
-                            <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" alt="Default Avatar" width="200" height="200">
+                            <img src="{% static 'backend/Graphics/DEFAULTPIC.png' %}" class="neighbor-img" alt="Default Avatar" style="width: 200px; height: 200px;">
 
                             {% endif %}
                             <p>@{{neighbour.username}}</p>
@@ -577,18 +577,17 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="detailPage" style="display: none;">
+            <div id="detailPage" style="display: none;">
             <div class="col-sm-9 " style="display: grid; align-items: center;">
                 <div class="g">
-                    <div class="container mt-5" style="margin-top: 250px !important;">
+                    <div class="container mt-8" >
                         <div class="d-flex justify-content-between align-items-center">
                             <!-- Back button positioned in the top left corner -->
                             <div>
                                 <img src="{% static 'backend/Graphics/BACKBUTTON.png' %}" alt="Back Button" id="backButton"
                                     style="max-width: 50px; max-height: 50px;">
                             </div>
-                            <div class="text-center" style="width: 80%;">
+                            <div class="text-center" style="width: 100%;">
                                 <h1 class="text-center mx-3">YOUR NEIGHBORHOOD</h1>
                             </div>
                         </div>
@@ -653,21 +652,22 @@
                                     <div class="bb-home--wrapper m-4 mx-auto">
                                         <div class="right-aligned-container"
                                             style="text-align: right;  padding: 10px; margin-bottom: 10px;">
-                                            <span>Posted on</span><span
-                                                id="updateDate">10-01-2024</span><span>@</span><span
+                                            <span>Posted on </span><span
+                                                id="updateDate">10-01-2024</span><span> @ </span><span
                                                 id="updateTime">5:34pm</span>
                                             <span>PST</span>
                                         </div>
 
                                         <!-- Another div containing a text area -->
-                                        <div class="text-area-container" style=" padding: 10px; margin-bottom: 10px;">
+                                        <div class="text-area-container" style=" padding: 10px; margin-bottom: 10px;" id="user-blinkboard">
+                                            hlo
                                         </div>
 
                                         <!-- Another div for the image with added class and margin bottom -->
                                         <div class="centered-image-container neighimgbottom"
                                             onclick="displayZoomedImage()"
                                             style="width: 200px; height: 200px; margin: 0 auto; overflow: hidden;">
-                                            <img src="assest/Graphics/NEIGHBORHOOD.png" id="zoomImage" alt="Your Image"
+                                            <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" id="zoomImage" alt="Your Image"
                                                 style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
                                     </div>
@@ -683,6 +683,8 @@
             </div>
 
         </div>
+        </div>
+
 
     </div>
 
@@ -701,12 +703,14 @@
 
     var neighbourhoodlink = document.getElementById("neighbourhood_link");
     var homeLink = document.getElementById("home_link");
+    var homeLink1 = document.getElementById("home_link1");
 
     neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+    homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
 
     function getCookie(name) {
         var cookieValue = null;
@@ -742,13 +746,13 @@
             // Create image element inside overlay
             var zoomedImage = document.createElement("img");
             zoomedImage.src = image.src; // Use the same source as the clicked image
-            zoomedImage.style.maxWidth = "90%";
-            zoomedImage.style.maxHeight = "90%";
+            zoomedImage.style.maxWidth = "50%";
+            zoomedImage.style.maxHeight = "50%";
             overlay.appendChild(zoomedImage);
 
             // Add close button to overlay
             var closeButton = document.createElement("img");
-            closeButton.src = "assest/Graphics/CLOSEBUTTON.png";
+            closeButton.src = "{%static 'backend/Graphics/CLOSEBUTTON.png' %}";
             closeButton.style.top = "10px"; // Adjust top position as needed
             closeButton.style.right = "10px"; // Adjust right position as needed
             closeButton.style.width = "30px"; // Adjust width as needed
@@ -760,7 +764,7 @@
             overlay.appendChild(closeButton);
 
             // For overlay to the container
-            var container = document.querySelector('.g .container');
+            var container = document.querySelector('.g');
             container.style.position = 'relative'; // Ensure container has a position
             container.appendChild(overlay);
         });
@@ -778,7 +782,7 @@
 
             // Get the username text
             var username = usernameElement.textContent.trim().substring(1);
-
+            console.log("username", username);
             // Find the clicked neighbor in the accepted_neighbourhoods list
             var clickedNeighbor = Object.values(accepted_neighbourhoods).find(function (neighbor) {
                 return neighbor.username === username;
@@ -786,6 +790,7 @@
 
             console.log(clickedNeighbor.username)
             if (clickedNeighbor) {
+            console.log(clickedNeighbor);
                 // Set detail page content
                 var detailTitle = document.querySelector('#detailPage h3');
                     var detailImage = document.getElementById('user_image');
@@ -796,16 +801,38 @@
                     var detailQuote = document.querySelector('#detailPage .fw-medium');
                     var detailBio = document.querySelector('#detailPage .fw-medium');
                     var blink_board_image = document.getElementById('zoomImage');
+                    var blinkboard = document.getElementById('user-blinkboard');
 
                     detailTitle.textContent = '@' + clickedNeighbor.username;
-                    detailImage.src = clickedNeighbor.avatar;
-                    blink_board_image.src = clickedNeighbor.blink_board_image;
+                    if (clickedNeighbor.avatar)
+                    {
+                        detailImage.src = clickedNeighbor.avatar;}
+                    else{
+                        detailImage.src = "{% static 'backend/Graphics/DEFAULTPIC.png' %}"}
+                    if (clickedNeighbor.blink_board_image)
+                    {
+                        blink_board_image.src = clickedNeighbor.blink_board_image;}
+                    else{
+                        blink_board_image.src = "{% static 'backend/Graphics/DEFAULTPIC.png' %}"}
                     detailUsername.textContent = clickedNeighbor.username;
                     detailLocation.textContent = clickedNeighbor.location;
                     detailQuote.textContent = clickedNeighbor.quote;
-                    updateDate.textContent = '{{ clickedNeighbor.updated_at|date:"F d, Y" }}',
-                    updateTime.textContent = '{{ clickedNeighbor.updated_at|time:"h:i A" }}',
+<!--                    updateDate.textContent = '{{ clickedNeighbor.updated_at|date:"F d, Y" }}'-->
+<!--                    updateTime.textContent = '{{ clickedNeighbor.updated_at|time:"h:i A" }}'-->
+                    blinkboard.textContent = clickedNeighbor.blink_board
                     detailBio.textContent = clickedNeighbor.bio;
+
+                 var updatedAtDate = new Date(clickedNeighbor.updated_at);
+                console.log(updatedAtDate);
+                // Format the date and time
+                var formattedDate = updatedAtDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                var formattedTime = updatedAtDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                console.log(formattedDate);
+                console.log(formattedTime);
+
+                updateDate.textContent = formattedDate;
+                updateTime.textContent = formattedTime;
+
                 // Show detail page and hide original gallery
                 document.getElementById('originalGallery').style.display = 'none';
                 document.getElementById('detailPage').style.display = 'block';
@@ -826,8 +853,6 @@
     function acceptFriendRequest(button) {
         // Get the parent div of the button (which is the column)
         var column = button.parentNode;
-        console.log("button clicked");
-        console.log(column)
         // Clone the entire column
         var clone = column.cloneNode(true);
 
