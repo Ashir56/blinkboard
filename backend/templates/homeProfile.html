@@ -432,11 +432,14 @@ function deleteCookie(name) {
 
     // Get the new access token from Django context
     var accessToken = "{{ access_token }}";
-
+    console.log(accessToken);
     // Delete the previous access_token cookie
+        console.log(document.cookie);
+
     deleteCookie("access_token");
 
-    document.cookie = "access_token=" + accessToken + "; path=/";
+    document.cookie = "access_token=" + encodeURIComponent(accessToken) + "; path=/";
+    console.log(document.cookie);
 
 
     var blinkboardLink = document.getElementById("blinkboard-link");

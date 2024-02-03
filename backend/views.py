@@ -97,7 +97,7 @@ def login_view(request):
             # Render the desired template, for example 'homeProfile.html'
             response = render(request, 'homeProfile.html', context)
             # response.set_cookie('access_token', access_token)
-            # response.set_cookie(f'access_token_{session_id}', access_token)
+            response.set_cookie('access_token', access_token)
 
             return response
         else:
@@ -127,47 +127,53 @@ def sign_up(request):
 @permission_classes([IsAuthenticated])
 def update_user(request):
     if request.method == 'GET':
-        user = request.user
-        return render(request, 'homeProfile.html', {'user': user})
+        try:
+            user = request.user
+            return render(request, 'homeProfile.html', {'user': user})
+        except Exception as e:
+            return render(request, 'login.html')
 
     if request.method == 'POST':
-        user = request.user
-        if user.is_authenticated:
-            location = request.data.get("location", None)
+        try:
+            user = request.user
+            if user.is_authenticated:
+                location = request.data.get("location", None)
 
-            bio = request.data.get("bio", None)
-            quote = request.data.get("quote", None)
-            if location and len(location) > 0:
-                user.location = location
+                bio = request.data.get("bio", None)
+                quote = request.data.get("quote", None)
+                if location and len(location) > 0:
+                    user.location = location
 
-            if bio and len(bio) > 0:
-                user.bio = bio
-            if quote and len(quote) > 0:
-                user.quote = quote
+                if bio and len(bio) > 0:
+                    user.bio = bio
+                if quote and len(quote) > 0:
+                    user.quote = quote
 
-            avatar_file = request.FILES.get('avatar')
-            if avatar_file:
-                if avatar_file.size > 0:
-                    user.avatar.save(avatar_file.name, avatar_file, save=True)
-                else:
-                    print("Uploaded file is empty.")
+                avatar_file = request.FILES.get('avatar')
+                if avatar_file:
+                    if avatar_file.size > 0:
+                        user.avatar.save(avatar_file.name, avatar_file, save=True)
+                    else:
+                        print("Uploaded file is empty.")
 
-            blink_board = request.data.get('blink_board', None)
-            if blink_board and len(blink_board) > 0:
-                user.blink_board = blink_board
-                user.updated_at = datetime.now()
+                blink_board = request.data.get('blink_board', None)
+                if blink_board and len(blink_board) > 0:
+                    user.blink_board = blink_board
+                    user.updated_at = datetime.now()
 
-            avatar_file = request.FILES.get('blink_board_image')
-            if avatar_file:
-                if avatar_file.size > 0:
-                    user.blink_board_image.save(avatar_file.name, avatar_file, save=True)
-                else:
-                    print("Uploaded file is empty.")
-            user.save()
-            return render(request, 'homeProfile.html', context={'user': user})
-        else:
-            print("User not authenticated!")
-            return JsonResponse({'success': False, 'error': 'User not authenticated'}, status=401)
+                avatar_file = request.FILES.get('blink_board_image')
+                if avatar_file:
+                    if avatar_file.size > 0:
+                        user.blink_board_image.save(avatar_file.name, avatar_file, save=True)
+                    else:
+                        print("Uploaded file is empty.")
+                user.save()
+                return render(request, 'homeProfile.html', context={'user': user})
+            else:
+                print("User not authenticated!")
+                return JsonResponse({'success': False, 'error': 'User not authenticated'}, status=401)
+        except Exception as e:
+            return render(request, 'login.html')
 
 
 def get_neighbourhood_context(user):
@@ -218,30 +224,36 @@ def get_neighbourhood_context(user):
 @permission_classes([AllowAny])
 def neighbourhood(request):
     if request.method == 'GET':
-        access_token = request.GET.get('access_token')
-        decoded_token = AccessToken(access_token)
+        try:
+            access_token = request.GET.get('access_token')
+            decoded_token = AccessToken(access_token)
 
-        user = User.objects.filter(id=decoded_token['user_id']).first()
-        context = get_neighbourhood_context(user)
-        print(user)
-        print(context)
-        return render(request, 'neighbourhood.html', context)
+            user = User.objects.filter(id=decoded_token['user_id']).first()
+            context = get_neighbourhood_context(user)
+            print(user)
+            print(context)
+            return render(request, 'neighbourhood.html', context)
+        except Exception as e:
+            return render(request, 'login.html')
 
     if request.method == 'POST':
-        access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
-        user = request.user
-        username = request.data.get('username', None)
-        print(user)
-        if username:
-            print(username)
-            neighbour = Friends.objects.filter(from_user__username=username, to_user=user).first()
-            neighbour.status = 'Accepted'
-            neighbour.save()
-            context = get_neighbourhood_context(user)
-            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
-        else:
-            context = get_neighbourhood_context(user)
-            return render(request, 'neighbourhood.html', context)
+        try:
+            access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+            user = request.user
+            username = request.data.get('username', None)
+            print(user)
+            if username:
+                print(username)
+                neighbour = Friends.objects.filter(from_user__username=username, to_user=user).first()
+                neighbour.status = 'Accepted'
+                neighbour.save()
+                context = get_neighbourhood_context(user)
+                return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+            else:
+                context = get_neighbourhood_context(user)
+                return render(request, 'neighbourhood.html', context)
+        except Exception as e:
+            return render(request, 'login.html')
 
 
 @api_view(['POST', 'GET'])
@@ -255,78 +267,87 @@ def findfriend(request):
 @permission_classes([AllowAny])
 def blinkboard(request):
     if request.method == 'GET':
-        access_token = request.GET.get('access_token')
-        decoded_token = AccessToken(access_token)
+        try:
+            access_token = request.GET.get('access_token')
+            decoded_token = AccessToken(access_token)
 
-        user = User.objects.filter(id=decoded_token['user_id']).first()
+            user = User.objects.filter(id=decoded_token['user_id']).first()
 
-        # neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
-        neighbours = get_all_friends(user)
-        print(neighbours)
-        neighbour_list = [{
-            'username': get_user_attribute(user, neighbour, 'username'),
-            'avatar': get_user_attribute(user, neighbour, 'avatar').url if get_user_attribute(user, neighbour,
-                                                                                              'avatar') else None,
-            'blink_board': get_user_attribute(user, neighbour, 'blink_board'),
-            'blink_board_image': get_user_attribute(user, neighbour, 'blink_board_image').url if get_user_attribute(
-                user, neighbour, 'blink_board_image') else None,
-            'updated_at': get_user_attribute(user, neighbour, 'updated_at')
-        } for neighbour in
-            neighbours]
-        context = {
-            'neighbours': neighbour_list
-        }
-        return render(request, 'blinkboard.html', context)
+            # neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
+            neighbours = get_all_friends(user)
+            print(neighbours)
+            neighbour_list = [{
+                'username': get_user_attribute(user, neighbour, 'username'),
+                'avatar': get_user_attribute(user, neighbour, 'avatar').url if get_user_attribute(user, neighbour,
+                                                                                                  'avatar') else None,
+                'blink_board': get_user_attribute(user, neighbour, 'blink_board'),
+                'blink_board_image': get_user_attribute(user, neighbour, 'blink_board_image').url if get_user_attribute(
+                    user, neighbour, 'blink_board_image') else None,
+                'updated_at': get_user_attribute(user, neighbour, 'updated_at')
+            } for neighbour in
+                neighbours]
+            context = {
+                'neighbours': neighbour_list
+            }
+            return render(request, 'blinkboard.html', context)
+        except Exception as e:
+            return render(request, 'login.html')
 
 
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def filter_friend(request):
     if request.method == 'GET':
-        user_name = request.GET.get('username')
-        print(user_name)
-        user = request.user
-        friends = get_friends(user)
-        usernames = []
-        users = None
-        for friend in friends:
-            if friend.from_user == user:
-                usernames.append(friend.to_user.username)
-            else:
-                usernames.append(friend.from_user.username)
-        if user_name:
-            users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
-        user_list = []
-        print(usernames)
-        if users:
-            for user in users:
-                if user.username not in usernames:
-                    user_data = {'username': user.username}
+        try:
+            user_name = request.GET.get('username')
+            print(user_name)
+            user = request.user
+            friends = get_friends(user)
+            usernames = []
+            users = None
+            for friend in friends:
+                if friend.from_user == user:
+                    usernames.append(friend.to_user.username)
+                else:
+                    usernames.append(friend.from_user.username)
+            if user_name:
+                users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
+            user_list = []
+            print(usernames)
+            if users:
+                for user in users:
+                    if user.username not in usernames:
+                        user_data = {'username': user.username}
 
-                    # Check if the avatar field has a file associated with it
-                    if user.avatar and user.avatar.file:
-                        user_data['avatar'] = user.avatar.url
-                    else:
-                        user_data['avatar'] = None  # Or any default value you prefer
-                    user_list.append(user_data)
+                        # Check if the avatar field has a file associated with it
+                        if user.avatar and user.avatar.file:
+                            user_data['avatar'] = user.avatar.url
+                        else:
+                            user_data['avatar'] = None  # Or any default value you prefer
+                        user_list.append(user_data)
 
-        return JsonResponse({'success': True, 'users': user_list, 'friends': usernames})
-
+            return JsonResponse({'success': True, 'users': user_list, 'friends': usernames})
+        except Exception as e:
+            return render(request, 'login.html')
 
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def send_friend_request(request):
     if request.method == 'POST':
-        requested_username = request.data.get('username')
-        user_name = request.user
+        try:
+            requested_username = request.data.get('username')
+            user_name = request.user
 
-        user = User.objects.get(username=requested_username)
-        if not Friends.objects.filter(from_user=user_name, to_user=user).exists():
-            Friends.objects.create(from_user=user_name, to_user=user)
+            user = User.objects.get(username=requested_username)
+            if not Friends.objects.filter(from_user=user_name, to_user=user).exists():
+                Friends.objects.create(from_user=user_name, to_user=user)
 
-            return JsonResponse({'status': 'success'})
-        else:
-            return JsonResponse({'status': 'already_friends'})
+                return JsonResponse({'status': 'success'})
+            else:
+                return JsonResponse({'status': 'already_friends'})
+        except Exception as e:
+            return render(request, 'login.html')
+
     else:
         return JsonResponse(500)
 
@@ -335,62 +356,67 @@ def send_friend_request(request):
 @permission_classes([IsAuthenticated])
 def delete_friend(request):
     if request.method == 'POST':
-        access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+        try:
+            access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
 
-        requested_username = request.data.get('username')
-        user_name = request.user
+            requested_username = request.data.get('username')
+            user_name = request.user
 
-        user = User.objects.get(username=requested_username)
-        if Friends.objects.filter(from_user=user_name, to_user=user).exists():
-            friendship = Friends.objects.filter(from_user=user_name, to_user=user).first()
-            friendship.delete()
-            print("1st")
-            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
-        elif Friends.objects.filter(to_user=user_name, from_user=user).exists():
-            friendship = Friends.objects.filter(to_user=user_name, from_user=user).first()
-            friendship.delete()
-            print("2nd")
-            return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+            user = User.objects.get(username=requested_username)
+            if Friends.objects.filter(from_user=user_name, to_user=user).exists():
+                friendship = Friends.objects.filter(from_user=user_name, to_user=user).first()
+                friendship.delete()
+                print("1st")
+                return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
+            elif Friends.objects.filter(to_user=user_name, from_user=user).exists():
+                friendship = Friends.objects.filter(to_user=user_name, from_user=user).first()
+                friendship.delete()
+                print("2nd")
+                return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
 
-        else:
-            return JsonResponse({'status': 'already_friends'})
-    else:
-        return JsonResponse(500)
+            else:
+                return JsonResponse({'status': 'already_friends'})
+        except Exception as e:
+            return render(request, 'login.html')
+
 
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def homeProfile(request):
     if request.method == 'GET':
-        access_token = request.GET.get('access_token')
-        if access_token:
-            decoded_token = AccessToken(access_token)
+        try:
+            access_token = request.GET.get('access_token')
+            if access_token:
+                decoded_token = AccessToken(access_token)
 
-            user = User.objects.filter(id=decoded_token['user_id']).first()
-        else:
-            user = request.user
+                user = User.objects.filter(id=decoded_token['user_id']).first()
+            else:
+                user = request.user
 
-        if user:
-            context = {
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'location': user.location,
-                    'bio': user.bio,
-                    'quote': user.quote,
-                    'avatar': user.avatar if user.avatar else None,
-                    'blink_board': user.blink_board,
-                    'blink_board_image': user.blink_board_image,
-                    'updated_at': user.updated_at
+            if user:
+                context = {
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'location': user.location,
+                        'bio': user.bio,
+                        'quote': user.quote,
+                        'avatar': user.avatar if user.avatar else None,
+                        'blink_board': user.blink_board,
+                        'blink_board_image': user.blink_board_image,
+                        'updated_at': user.updated_at
 
-                },
-                'access_token': access_token,
-            }
+                    },
+                    'access_token': access_token,
+                }
 
-            # return Response(context)
+                # return Response(context)
 
-            # Render the desired template, for example 'homeProfile.html'
-            return render(request, 'homeProfile.html', context)
-        else:
-            return JsonResponse("No User Found")
+                # Render the desired template, for example 'homeProfile.html'
+                return render(request, 'homeProfile.html', context)
+            else:
+                return JsonResponse("No User Found")
+        except Exception as e:
+            return render(request, 'login.html')
