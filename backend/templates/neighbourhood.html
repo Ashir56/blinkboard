@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>NeighborHood</title>
     <style>
         body {
             overflow-x: hidden !important;
@@ -316,7 +316,7 @@
             }
 
             .col-sm-9 .container {
-                margin-top: 0% !important;
+                margin-top: 150px !important;
             }
 
             .center-container {
@@ -519,7 +519,7 @@
                         style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
-                <a href="{% url 'backend:findfriend' %}" class="nav__link ">
+                <a href="#" class="nav__link " id="find_friend_link">
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
@@ -699,7 +699,7 @@
 
 <script>
 
-    var accessToken = getCookie("access_token");
+    var accessToken = getCookie("user_id_{{user.id}}");
 
     var neighbourhoodlink = document.getElementById("neighbourhood_link");
     var homeLink = document.getElementById("home_link");
@@ -711,6 +711,9 @@
     blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
     homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
     homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+    var FindFriendLink = document.getElementById("find_friend_link");
+    FindFriendLink.href = "{% url 'backend:findfriend' %}?access_token=" + accessToken;
+
 
     function getCookie(name) {
         var cookieValue = null;
@@ -936,7 +939,7 @@
 
     // Use the fetch function to make the AJAX request
 
-    fetch(updateUrl, {
+    fetch(updateUrl + '?user_id=' + getCookie("user_id_{{user.id}}"), {
         method: 'POST',
 
         headers: {

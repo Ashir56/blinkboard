@@ -1,0 +1,58 @@
+version: "2.2"
+
+services:
+  db:
+      image: postgres:latest
+      volumes:
+        - ./data/db:/var/lib/postgresql/data
+      ports:
+        - "8001:5432"
+      environment:
+        - POSTGRES_DB=seq_sparky_dev_01
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=E}8qeS++c1-3
+  #    command: -p 5432
+
+  web:
+    container_name: seq_sparky_back
+    build: .
+    command: daphne -b 0.0.0.0 -p 8000 SEQSparky.asgi:application
+    #    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/seq_sparky
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build: .
+    command: celery -A SEQSparky.celery worker --loglevel=info --logfile=celery.log # Command used to start the Celery worker in the Docker container
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      # depends on show that celery worker service requires the web service and the redis service to run
+    depends_on:
+      - web
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A SEQSparky.celery beat -l info
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest

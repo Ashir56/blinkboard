@@ -356,7 +356,7 @@
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
-                <a href="{% url 'backend:findfriend' %}" class="nav__link ">
+                <a href="#" class="nav__link " id="find_friend_link">
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
@@ -432,24 +432,24 @@ function deleteCookie(name) {
 
     // Get the new access token from Django context
     var accessToken = "{{ access_token }}";
-    console.log(accessToken);
     // Delete the previous access_token cookie
-        console.log(document.cookie);
 
-    deleteCookie("access_token");
+<!--    deleteCookie("user_id_{user.id}");-->
 
-    document.cookie = "access_token=" + encodeURIComponent(accessToken) + "; path=/";
-    console.log(document.cookie);
+<!--    document.cookie = "user_id_=" + {{user.id}} + "; path=/";-->
 
+    var access_Token = getCookie("user_id_{{user.id}}");
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     var homeLink = document.getElementById("home_link");
     var homeLink1 = document.getElementById("home_link1");
     var neighbourhoodLink = document.getElementById("neighbourhood_link");
-    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + accessToken;
-    neighbourhoodLink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken;
-    homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
-    homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+    blinkboardLink.href = "{% url 'backend:blinkboard' %}?access_token=" + access_Token;
+    neighbourhoodLink.href = "{% url 'backend:neighbourhood' %}?access_token=" + access_Token;
+    homeLink.href = "{% url 'backend:home' %}?access_token=" + access_Token;
+    homeLink1.href = "{% url 'backend:home' %}?access_token=" + access_Token;
+    var FindFriendLink = document.getElementById("find_friend_link");
+    FindFriendLink.href = "{% url 'backend:findfriend' %}?access_token=" + access_Token;
 
 
 

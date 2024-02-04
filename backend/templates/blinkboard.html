@@ -530,7 +530,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             renderNeighbours(data);
         })
         .catch(error => console.error('Error:', error));
@@ -610,7 +609,7 @@
                     <img src="{% static 'backend/Graphics/NEIGHBORHOOD.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">NEIGHBORHOOD</span>
                 </a>
-                <a href="{% url 'backend:findfriend' %}" class="nav__link ">
+                <a href="#" class="nav__link" id="find_friend_link">
                     <img src="{% static 'backend/Graphics/FINDFRIEND.png' %}" alt="" style="height:50px; width: 50px;">
                     <span class="nav__text">FINDFRIENDS</span>
                 </a>
@@ -673,8 +672,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
-    var accessToken = getCookie("access_token");
-    console.log(accessToken);
+    var accessToken = getCookie("user_id_{{user.id}}");
+    console.log("USER", accessToken);
 
     var blinkboardLink = document.getElementById("blinkboard-link");
     var neighbourhoodlink = document.getElementById("neighbourhood_link");
@@ -686,6 +685,8 @@
     neighbourhoodlink.href = "{% url 'backend:neighbourhood' %}?access_token=" + accessToken
     homeLink.href = "{% url 'backend:home' %}?access_token=" + accessToken;
     homeLink1.href = "{% url 'backend:home' %}?access_token=" + accessToken;
+var FindFriendLink = document.getElementById("find_friend_link");
+    FindFriendLink.href = "{% url 'backend:findfriend' %}?access_token=" + accessToken;
 
 
     function getCookie(name) {

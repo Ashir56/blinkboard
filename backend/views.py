@@ -32,11 +32,9 @@ def get_user_attribute(user, friend, attribute):
 def get_all_friends(user):
     # Retrieve friends where the user is the sender (from_user) and the request is accepted
     sent_and_accepted = Friends.objects.filter(from_user=user, status='Accepted')
-    print(sent_and_accepted)
 
     # Retrieve friends where the user is the receiver (to_user) and the request is accepted
     received_and_accepted = Friends.objects.filter(to_user=user, status='Accepted')
-    print(received_and_accepted)
     # Combine both sets of friends
     all_friends = sent_and_accepted | received_and_accepted
 
@@ -98,6 +96,7 @@ def login_view(request):
             response = render(request, 'homeProfile.html', context)
             # response.set_cookie('access_token', access_token)
             response.set_cookie('access_token', access_token)
+            response.set_cookie(f'user_id_{user.id}', user.id)
 
             return response
         else:
@@ -225,18 +224,23 @@ def neighbourhood(request):
     if request.method == 'GET':
         try:
             access_token = request.GET.get('access_token')
-            decoded_token = AccessToken(access_token)
+            # decoded_token = AccessToken(access_token)
 
-            user = User.objects.filter(id=decoded_token['user_id']).first()
+            user = User.objects.filter(id=access_token).first()
             context = get_neighbourhood_context(user)
+            context['user'] = user
             return render(request, 'neighbourhood.html', context)
         except Exception as e:
             return render(request, 'login.html')
 
     if request.method == 'POST':
         try:
-            access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
-            user = request.user
+            user_id = request.GET.get('user_id', None)
+            if user_id:
+                user = User.objects.filter(id=user_id).first()
+            else:
+                access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+                user = request.user
             username = request.data.get('username', None)
             if username:
                 neighbour = Friends.objects.filter(from_user__username=username, to_user=user).first()
@@ -255,7 +259,14 @@ def neighbourhood(request):
 @permission_classes([AllowAny])
 def findfriend(request):
     if request.method == 'GET':
-        return render(request, 'findfriend.html')
+        user_id = request.GET.get('access_token')
+        user = User.objects.filter(id=user_id).first()
+        if user:
+
+           return render(request, 'findfriend.html', context={'user': user})
+        else:
+            return render(request, 'login.html')
+
 
 
 @api_view(['POST', 'GET'])
@@ -264,9 +275,9 @@ def blinkboard(request):
     if request.method == 'GET':
         try:
             access_token = request.GET.get('access_token')
-            decoded_token = AccessToken(access_token)
+            # decoded_token = AccessToken(access_token)
 
-            user = User.objects.filter(id=decoded_token['user_id']).first()
+            user = User.objects.filter(id=access_token).first()
 
             # neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
             neighbours = get_all_friends(user)
@@ -281,6 +292,7 @@ def blinkboard(request):
             } for neighbour in
                 neighbours]
             context = {
+                'user':user,
                 'neighbours': neighbour_list
             }
             return render(request, 'blinkboard.html', context)
@@ -349,10 +361,14 @@ def send_friend_request(request):
 def delete_friend(request):
     if request.method == 'POST':
         try:
-            access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+            user_id = request.GET.get('user_id', None)
+            if user_id:
+                user_name = User.objects.filter(id=user_id).first()
+            else:
+                access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
+                user_name = request.user
 
             requested_username = request.data.get('username')
-            user_name = request.user
 
             user = User.objects.get(username=requested_username)
             if Friends.objects.filter(from_user=user_name, to_user=user).exists():
@@ -367,7 +383,7 @@ def delete_friend(request):
                 return redirect(reverse('backend:neighbourhood') + f'?access_token={access_token}')
 
             else:
-                return JsonResponse({'status': 'already_friends'})
+                return JsonResponse({'status': 'already_removed'})
         except Exception as e:
             return render(request, 'login.html')
 
@@ -380,9 +396,9 @@ def homeProfile(request):
         try:
             access_token = request.GET.get('access_token')
             if access_token:
-                decoded_token = AccessToken(access_token)
+                # decoded_token = AccessToken(access_token)
 
-                user = User.objects.filter(id=decoded_token['user_id']).first()
+                user = User.objects.filter(id=access_token).first()
             else:
                 user = request.user
 
