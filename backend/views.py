@@ -177,7 +177,6 @@ def update_user(request):
 
 
 def get_neighbourhood_context(user):
-    print(user.id)
     pending_request = Friends.objects.filter(to_user=user, status='Pending')
     # accepted_request = get_all_friends(user)
     sent_and_accepted = Friends.objects.filter(from_user=user, status='Accepted')
@@ -230,8 +229,6 @@ def neighbourhood(request):
 
             user = User.objects.filter(id=decoded_token['user_id']).first()
             context = get_neighbourhood_context(user)
-            print(user)
-            print(context)
             return render(request, 'neighbourhood.html', context)
         except Exception as e:
             return render(request, 'login.html')
@@ -241,9 +238,7 @@ def neighbourhood(request):
             access_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
             user = request.user
             username = request.data.get('username', None)
-            print(user)
             if username:
-                print(username)
                 neighbour = Friends.objects.filter(from_user__username=username, to_user=user).first()
                 neighbour.status = 'Accepted'
                 neighbour.save()
@@ -275,7 +270,6 @@ def blinkboard(request):
 
             # neighbours = User.objects.filter(location__icontains=user.location).order_by('-updated_at').exclude(username=user.username)
             neighbours = get_all_friends(user)
-            print(neighbours)
             neighbour_list = [{
                 'username': get_user_attribute(user, neighbour, 'username'),
                 'avatar': get_user_attribute(user, neighbour, 'avatar').url if get_user_attribute(user, neighbour,
@@ -300,7 +294,6 @@ def filter_friend(request):
     if request.method == 'GET':
         try:
             user_name = request.GET.get('username')
-            print(user_name)
             user = request.user
             friends = get_friends(user)
             usernames = []
@@ -313,7 +306,6 @@ def filter_friend(request):
             if user_name:
                 users = User.objects.filter(username__icontains=user_name).exclude(username=request.user.username)
             user_list = []
-            print(usernames)
             if users:
                 for user in users:
                     if user.username not in usernames:
